@@ -1,3 +1,6 @@
+
+
+
 // parse request params
 var q1 = $.url().param('q1');
 $('input[name="q1"]').val(q1);

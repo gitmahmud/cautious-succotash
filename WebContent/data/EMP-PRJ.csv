@@ -1,3 +1,13 @@
 ID,EMP,NAME,ROLE,DESCRIPTION
-1,1,proj1,manager,Co-ordinate all managerial tasks.
-2,2,proj2,team lead ,Lead  all software engineers .
+1,1,proj1,Manager,Co-ordinate all managerial tasks for this project.
+2,2,proj1,Team Lead,Lead  all software engineers .
+3,3,proj1,Junior Engineer,Do coding assignments provided by your team lead.
+5,5,proj2,Manager,Co-ordinate all managerial tasks project.
+7,7,proj2,Team Lead,Lead  all software engineers .
+9,9,proj2,Junior Engineer,Do coding assignments provided by your team lead.
+10,10,proj2,Junior Engineer,Do coding assignments provided by your team lead.
+13,13,proj2,Junior Engineer,Do coding assignments provided by your team lead.
+14,14,proj1,Manager,Manage sales team for this project.
+16,16,proj1,Trainee,Do your trainee tasks given by your manager.
+17,17,proj1,Manager,Manage marketing for this project.
+19,19,proj1,Member,Do campaigning in outsides.

@@ -13,7 +13,8 @@ $('#pspt_no').text(emp.pspt_no);
 $('#pspt_date').text(emp.pspt_date);
 $('#pspt_name').text(emp.pspt_name);
 $('#rental').text(DB.choice(emp.rental));
-
+$('#employee_department').text(emp.dept);
+console.log("Employee Id "+id);
 
 var emp_personal_extended = alasql('SELECT * FROM professional WHERE emp=?', [ id])[0];
 
@@ -28,6 +29,7 @@ var emp_project = alasql('SELECT * FROM project WHERE emp=?', [ id])[0];
 $('#project_name').text(emp_project.name);
 $('#project_description').text(emp_project.description);
 $('#project_role').text(emp_project.role);
+
 
 var emp_skills = alasql('SELECT * FROM skill WHERE emp=?' ,[id]);
 

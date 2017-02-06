@@ -111,22 +111,22 @@
 		</table>
 	</div>
 	<script src="js/index.js"></script>
+	<script src="js/db.js"></script>
 	<script>
-        $('#more_search_button').on('click',function () {
-            if($('#search_field2').attr('type') === "hidden")
+		$('#more_search_button').on('click',function () {
+			if($('#search_field2').attr('type') === "hidden")
 			{
-			    $('#search_field2').attr('type' , 'text');
+				$('#search_field2').attr('type' , 'text');
 			}
 			else if($('#search_field3').attr('type') === "hidden")
 			{
-                $('#search_field3').attr('type' , 'text');
-                $('#more_search_button').hide();
+				$('#search_field3').attr('type' , 'text');
+				$('#more_search_button').hide();
 
 			}
 
-        })
-
-
+		});
 	</script>
+
 </body>
 </html>
