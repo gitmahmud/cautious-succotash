@@ -13,21 +13,26 @@ $('#pspt_no').text(emp.pspt_no);
 $('#pspt_date').text(emp.pspt_date);
 $('#pspt_name').text(emp.pspt_name);
 $('#rental').text(DB.choice(emp.rental));
+$('#employee_department').text(emp.dept);
+
 
 
 var emp_personal_extended = alasql('SELECT * FROM professional WHERE emp=?', [ id])[0];
 
 console.log('a '+emp_personal_extended.nationality);
 console.log('b '+emp_personal_extended.bank_account);
+console.log("Employee Id "+id);
 $('#joining_date').text(getDateFromMS(emp_personal_extended.joining));
 $('#nationality').text(emp_personal_extended.nationality);
 $('#bank_account').text(emp_personal_extended.bank_account);
 
 var emp_project = alasql('SELECT * FROM project WHERE emp=?', [ id])[0];
 
-$('#project_name').text(emp_project.name);
-$('#project_description').text(emp_project.description);
-$('#project_role').text(emp_project.role);
+if(emp_project !== undefined) {
+    $('#project_name').text(emp_project.name);
+    $('#project_description').text(emp_project.description);
+    $('#project_role').text(emp_project.role);
+}
 
 var emp_skills = alasql('SELECT * FROM skill WHERE emp=?' ,[id]);
 

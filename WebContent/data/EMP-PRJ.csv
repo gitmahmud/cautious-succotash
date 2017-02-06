@@ -1,3 +1,11 @@
 ID,EMP,NAME,ROLE,DESCRIPTION
-1,1,proj1,manager,Co-ordinate all managerial tasks.
-2,2,proj2,team lead ,Lead  all software engineers .
+1,1,proj1,Manager,Co-ordinate all managerial tasks.
+2,2,proj1,Team lead ,Lead  all software engineers .
+3,3,proj1,Team member ,Lead  all software engineers .
+4,4,proj1,Team member ,Lead  all software engineers .
+5,5,proj1,Team member ,Lead  all software engineers .
+6,6,proj2,Team lead ,Lead  all software engineers .
+7,7,proj2,Team member ,Lead  all software engineers .
+8,8,proj2,Team member ,Lead  all software engineers .
+9,9,proj3,Team member ,Lead  all software engineers .
+10,10,proj3,Team lead ,Lead  all software engineers .
