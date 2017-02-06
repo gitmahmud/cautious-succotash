@@ -55,10 +55,49 @@ DB.load = function() {
 				}
 			});
 
-	// reload html
-	Promise.all([ pemp, paddr, pfamily, pedu, pchoice ]).then(function() {
-		window.location.reload(true);
-	});
+	//personal extended
+    alasql('DROP TABLE IF EXISTS professional;');
+    var ret = alasql('CREATE TABLE professional(id INT IDENTITY, emp STRING, joining STRING, nationality STRING, bank_account STRING);');
+    console.log("create table professional "+ret);
+	var pprof =  alasql.promise('SELECT MATRIX * FROM CSV("data/PERSONAL-PROFESSIONAL.csv", {headers: true})').then(
+        function(professionals) {
+            for (var i = 0; i < professionals.length; i++) {
+                alasql('INSERT INTO professional VALUES(?,?,?,?,?);', professionals[i]);
+            }
+        });
+
+	//employee skill
+	alasql('DROP TABLE IF EXISTS skill;');
+    alasql('CREATE TABLE skill(id INT IDENTITY,emp STRING, name STRING, rating INT);');
+
+    var pskill =  alasql.promise('SELECT MATRIX * FROM CSV("data/EMP-SKILL.csv", {headers: true})').then(
+        function(skills) {
+            for (var i = 0; i < skills.length; i++) {
+                alasql('INSERT INTO skill VALUES(?,?,?,?);', skills[i]);
+            }
+        });
+
+    //employee project
+
+    alasql('DROP TABLE IF EXISTS project;');
+    alasql('CREATE TABLE project(id INT IDENTITY,emp STRING, name STRING, role STRING, description STRING);');
+
+    var pproject =  alasql.promise('SELECT MATRIX * FROM CSV("data/EMP-PRJ.csv", {headers: true})').then(
+        function(projects) {
+            for (var i = 0; i < projects.length; i++) {
+                alasql('INSERT INTO project VALUES(?,?,?,?,?);', projects[i]);
+            }
+        });
+
+
+    // reload html
+    Promise.all([ pemp, paddr, pfamily, pedu, pchoice, pprof,pskill, pproject ]).then(function() {
+        window.location.reload(true);
+    });
+
+
+
+
 };
 
 DB.remove = function() {

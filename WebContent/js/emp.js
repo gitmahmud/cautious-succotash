@@ -14,6 +14,28 @@ $('#pspt_date').text(emp.pspt_date);
 $('#pspt_name').text(emp.pspt_name);
 $('#rental').text(DB.choice(emp.rental));
 
+
+var emp_personal_extended = alasql('SELECT * FROM professional WHERE emp=?', [ id])[0];
+
+console.log('a '+emp_personal_extended.nationality);
+console.log('b '+emp_personal_extended.bank_account);
+$('#joining_date').text(getDateFromMS(emp_personal_extended.joining));
+$('#nationality').text(emp_personal_extended.nationality);
+$('#bank_account').text(emp_personal_extended.bank_account);
+
+var emp_project = alasql('SELECT * FROM project WHERE emp=?', [ id])[0];
+
+$('#project_name').text(emp_project.name);
+$('#project_description').text(emp_project.description);
+$('#project_role').text(emp_project.role);
+
+var emp_skills = alasql('SELECT * FROM skill WHERE emp=?' ,[id]);
+
+for(let i =0;i<emp_skills.length ; i++) {
+    $('#tbody-skill').append('<tr><th scope="row">' + (i+1) +'</th><td>' + emp_skills[i]["name"] + '</td><td>' +emp_skills[i]["rating"] + '</td></tr>');
+}
+
+
 // set image and name
 $('#img-emp').attr('src', 'img/' + emp.id + '.jpg');
 $('#div-name_kanji').text(emp.name);
@@ -81,4 +103,10 @@ function destroy() {
 		alasql('DELETE FROM emp WHERE id=?', [ id ]);
 		window.location.assign('index.html');
 	}
+}
+
+function getDateFromMS(r) {
+	let t = new Date(r);
+	return t.getFullYear() + "/"+(t.getMonth()+1)+"/"+t.getDate();
+
 }

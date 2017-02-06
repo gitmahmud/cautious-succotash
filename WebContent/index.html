@@ -69,6 +69,27 @@
 			</button>
 		</form>
 		<hr>
+		<form action="index.html" class="form-inline text-center">
+
+			<div class="form-group">
+				<input name="q3" type="text" class="form-control"
+					   placeholder="Search Anything">
+				<input name="q4" type="hidden" class="form-control" placeholder="Search Anything" id="search_field2">
+				<input name="q5" type="hidden" class="form-control" placeholder="Search Anything" id="search_field3">
+			</div>
+
+
+			<button type="button" class="btn btn-warning" id="more_search_button">
+				<span class="glyphicon glyphicon-plus"></span>More Search
+			</button>
+
+
+			<button type="submit" class="btn btn-primary">
+				<span class="glyphicon glyphicon-search"></span> Free Search
+			</button>
+		</form>
+		<hr>
+
 
 		<div class="clearfix" style="margin: 10px 0;">
 			<a href="emp-form.html" class="btn btn-sm btn-success pull-right"><span
@@ -90,5 +111,22 @@
 		</table>
 	</div>
 	<script src="js/index.js"></script>
+	<script>
+        $('#more_search_button').on('click',function () {
+            if($('#search_field2').attr('type') === "hidden")
+			{
+			    $('#search_field2').attr('type' , 'text');
+			}
+			else if($('#search_field3').attr('type') === "hidden")
+			{
+                $('#search_field3').attr('type' , 'text');
+                $('#more_search_button').hide();
+
+			}
+
+        })
+
+
+	</script>
 </body>
 </html>
