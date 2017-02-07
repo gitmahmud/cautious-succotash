@@ -103,6 +103,28 @@ for (var i = 0; i < edus.length; i++) {
 }
 $('#ins-edu').attr('href', 'edu-form.html?emp=' + id);
 
+//read payroll information
+
+var pays = alasql("SELECT * FROM payroll WHERE emp=?",[ id ]);
+var total_pay = 0;
+for(var i =0;i<pays.length;i++){
+	if(pays[i]["type"] === "plus")
+	{
+		total_pay += pays[i]["amount"];
+        $("#tbody-payroll").append('<tr class="text-success"><td>' + pays[i]["item"] + '</td><td>' +pays[i]["amount"] + '</td></tr>');
+	}
+	else
+	{
+		total_pay -= pays[i]["amount"];
+        $("#tbody-payroll").append('<tr class="text-danger"><td>' + pays[i]["item"] + '</td><td>' +pays[i]["amount"] + '</td></tr>');
+	}
+
+
+}
+
+$("#tbody-payroll").append('<tr bgcolor="#008b8b" ><td><b>Total : </b></td><td><b>' +total_pay+ '</b></td></tr>');
+
+
 // delete employee
 function destroy() {
 	if (window.confirm('are you sure to delete employee?')) {

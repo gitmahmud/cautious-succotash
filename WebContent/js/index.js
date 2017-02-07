@@ -30,6 +30,7 @@ if(q3 !== undefined) {
 
 	if(q3)
 	{
+
 		let tempEmps = parseSearchString(q3) ;
 		if(tempEmps === undefined)
 		{
@@ -118,7 +119,18 @@ if(q3 !== undefined) {
         }
 	}
 
+	let linkPayroll = "add-payroll.html?p=";
 
+	for(let i =0;i<emps.length ; i++)
+	{
+		linkPayroll += emps[i]["id"];
+		if(i !== emps.length - 1)
+		{
+			linkPayroll += ",";
+		}
+
+	}
+    $("#button_add_payroll").attr("href",linkPayroll);
 
 
 

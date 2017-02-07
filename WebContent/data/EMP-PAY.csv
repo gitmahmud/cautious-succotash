@@ -1,0 +1,11 @@
+ID,EMP,ITEM,AMOUNT,TYPE
+1,1,Basic salary,1000,plus
+2,1,Bonus,200,plus
+3,1,Transportation Allowance,50,plus
+4,1,Fund A,100,minus
+5,2,Basic salary,800,plus
+6,2,Bonus,150,plus
+7,2,Fund B,100,minus
+8,2,Transportation Allowance,20,plus
+9,3,Basic Salary,500,plus
+10,3,Transportation Allowance,10,plus

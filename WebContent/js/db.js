@@ -89,9 +89,19 @@ DB.load = function() {
             }
         });
 
+    alasql('DROP TABLE IF EXISTS payroll;');
+    alasql('CREATE TABLE payroll(id INT IDENTITY,emp STRING, item STRING, amount INT, type STRING);');
+
+    var ppayroll =  alasql.promise('SELECT MATRIX * FROM CSV("data/EMP-PAY.csv", {headers: true})').then(
+        function(payrolls) {
+            for (var i = 0; i < payrolls.length; i++) {
+                alasql('INSERT INTO payroll VALUES(?,?,?,?,?);', payrolls[i]);
+            }
+        });
+
 
     // reload html
-    Promise.all([ pemp, paddr, pfamily, pedu, pchoice, pprof,pskill, pproject ]).then(function() {
+    Promise.all([ pemp, paddr, pfamily, pedu, pchoice, pprof,pskill, pproject,ppayroll ]).then(function() {
 
     	console.log("here it is!");
     	var directSearchJson = {};
