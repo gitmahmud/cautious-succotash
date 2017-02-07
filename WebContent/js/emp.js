@@ -22,6 +22,7 @@ var emp_personal_extended = alasql('SELECT * FROM professional WHERE emp=?', [ i
 console.log('a '+emp_personal_extended.nationality);
 console.log('b '+emp_personal_extended.bank_account);
 console.log("Employee Id "+id);
+
 $('#joining_date').text(getDateFromMS(emp_personal_extended.joining));
 $('#nationality').text(emp_personal_extended.nationality);
 $('#bank_account').text(emp_personal_extended.bank_account);

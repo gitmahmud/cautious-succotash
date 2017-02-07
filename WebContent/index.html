@@ -84,16 +84,19 @@
 			</button>
 
 
-			<button type="submit" class="btn btn-primary">
+			<button type="submit" class="btn btn-primary" id="free_search_button">
 				<span class="glyphicon glyphicon-search"></span> Free Search
 			</button>
 		</form>
 		<hr>
 
 
-		<div class="clearfix" style="margin: 10px 0;">
+
+		<div class="clearfix" style="margin: 10px 0;" id="new_emp">
+
 			<a href="emp-form.html" class="btn btn-sm btn-success pull-right"><span
 				class="glyphicon glyphicon-plus"></span> New</a>
+
 		</div>
 
 		<table class="table table-striped">
@@ -109,9 +112,20 @@
 			</thead>
 			<tbody id="tbody-emps"></tbody>
 		</table>
+
+		<div class="clearfix" style="margin: 10px 0;" id="business_op">
+			<a href="#" class="btn btn-lg btn-primary" style="margin-left: 20%">
+				<span class="glyphicon glyphicon-yen" >Adjust Payroll</span>
+			</a>
+			<a href="#" class="btn btn-lg btn-primary" style="margin-left: 40%">
+				<span class="glyphicon glyphicon-tasks" >Assign Task</span>
+			</a>
+
+		</div>
 	</div>
 	<script src="js/index.js"></script>
 	<script>
+
         $('#more_search_button').on('click',function () {
             if($('#search_field2').attr('type') === "hidden")
 			{
@@ -124,7 +138,10 @@
 
 			}
 
-        })
+        });
+
+
+
 
 
 	</script>

@@ -15,64 +15,133 @@ $('input[name="q4"]').val(q4);
 var q5 = $.url().param('q5');
 $('input[name="q5"]').val(q5);
 
-var t  = alasql('SELECT id FROM emp', []);
-let allEmpId =[];
 
-for(let i =0;i<allEmpId.length ;i++)
-{
-	console.log(t[i]);
-	allEmpId.push(t[i]["id"]);
 
-}
-console.log(allEmpId);
 
-// read data from database
+
+console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
+var directSearchJson = JSON.parse(localStorage.getItem("directSearchJson"));
+
+
 var emps;
-if (q1) {
-	emps = alasql('SELECT * FROM emp WHERE number LIKE ?', [ '%' + q1 + '%' ]);
-} else if (q2) {
-	emps = alasql('SELECT * FROM emp WHERE name LIKE ?', [ '%' + q2 + '%' ]);
-}
 
-else {
-	emps = alasql('SELECT * FROM emp', []);
-}
+if(q3 !== undefined) {
+    emps = alasql('SELECT * FROM emp', []);
 
-var emp_q3 =[],emp_q4=[] , emp_q5 = []  ;
-if(q3){
+	if(q3)
+	{
+		let tempEmps = parseSearchString(q3) ;
+		if(tempEmps === undefined)
+		{
+			tempEmps = [];
+		}
 
-	emp_q3 = parseSearchString(q3);
-	console.log("Emp q3 "+emp_q3);
+		console.log(tempEmps);
+
+
+		for(let i =0;i<emps.length ;i++)
+		{
+			let isFound = false;
+			for(let j =0;j<tempEmps.length ; j++)
+			{
+				if(emps[i]["id"] === tempEmps[j]["id"])
+				{
+					isFound = true;
+					break;
+				}
+			}
+			if(!isFound)
+			{
+				emps.splice(i,1);
+				i--;
+			}
+		}
+	}
+	if(q4)
+	{
+        let tempEmps = parseSearchString(q4) ;
+        if(tempEmps === undefined)
+        {
+            tempEmps = [];
+        }
+
+        console.log(tempEmps);
+
+
+        for(let i =0;i<emps.length ;i++)
+        {
+            let isFound = false;
+            for(let j =0;j<tempEmps.length ; j++)
+            {
+                if(emps[i]["id"] === tempEmps[j]["id"])
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+            if(!isFound)
+            {
+                emps.splice(i,1);
+                i--;
+            }
+        }
+
+
+	}
+	if(q5)
+	{
+        let tempEmps = parseSearchString(q5) ;
+        if(tempEmps === undefined)
+        {
+            tempEmps = [];
+        }
+
+        console.log(tempEmps);
+
+
+        for(let i =0;i<emps.length ;i++)
+        {
+            let isFound = false;
+            for(let j =0;j<tempEmps.length ; j++)
+            {
+                if(emps[i]["id"] === tempEmps[j]["id"])
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+            if(!isFound)
+            {
+                emps.splice(i,1);
+                i--;
+            }
+        }
+	}
+
+
+
+
+
+
+
 }
 else
 {
-    emp_q3 = 	allEmpId;
-}
-if(q4){
+	console.log("q1");
 
-    emp_q4 = parseSearchString(q4);
-}
-else
-{
-    emp_q4 = allEmpId;
-}
-if(q5)
-{
-    emp_q5 = parseSearchString(q5);
 
-}
-else
-{
-	emp_q5 = allEmpId;
+    if (q1) {
+        emps = alasql('SELECT * FROM emp WHERE number LIKE ?', ['%' + q1 + '%']);
+    } else if (q2) {
+        emps = alasql('SELECT * FROM emp WHERE name LIKE ?', ['%' + q2 + '%']);
+    }
 
-}
+    else {
+        emps = alasql('SELECT * FROM emp', []);
+    }
 
 
 
-var empIds = getIntersection(emp_q3,emp_q4,emp_q5);
-console.log(empIds);
-if(q3) {
-emps = alasql('SELECT * FROM emp WHERE id = ? ',empIds);
 
 }
 
@@ -96,33 +165,228 @@ function parseSearchString(str)
 {
 	console.log("str "+str);
 
-	if(str.startsWith("Joined"))
+	//First -> Direct Search
+
+
+	if(directSearchJson[str] !== undefined )
 	{
+		let sqlStr ='SELECT * from '+directSearchJson[str]["table"]+" where "+directSearchJson[str]["type"]+" LIKE  ?";
+		console.log("//"+sqlStr);
 
-		let arr = str.split(' ');
-		console.log(arr);
-		if(arr[arr.length -1 ] === 'today')
-		{
-			let d = new Date();
-			d.setHours(0,0,0,0);
-			console.log("D "+d.getTime());
-            return alasql('SELECT emp from professional where joining >= '+d.getTime());
+		return alasql('SELECT * from '+directSearchJson[str]["table"]+" where "+directSearchJson[str]["type"]+" LIKE  ?",['%'+str+'%']);
+
+	}
+	else
+	{
+        if(str.startsWith("Joined") || str.startsWith("has"))
+        {
+
+            let arr = str.split(' ');
+            console.log(arr);
+            if(arr[arr.length -1 ] === 'today')
+            {
+                let d = new Date();
+                d.setHours(0,0,0,0);
+                console.log("D "+d.getTime());
+                return alasql('SELECT emp from professional where joining >= '+d.getTime());
+
+            }
 
 
-		}
+            if(arr[arr.length - 1] === "week")
+            {
+                if(arr[1] === 'this')
+                {
+                	console.log("Joined this week . ");
+                	let d = new Date();
+                	d.setMilliseconds(d.getMilliseconds() - d.getDay() * 24*3600*1000);
+                	d.setHours(0,0,0,0);
+                	return alasql("SELECT * from professional where joining >="+d.getTime());
 
+                }
+                else{
+                	console.log("Joined last week.");
+                	let d = new Date();
+                	let dd = new Date();
+                	d.setMilliseconds(d.getMilliseconds() - (d.getDay()+7) * 24*3600*1000  );
+                	d.setHours(0,0,0,0);
+                	dd.setMilliseconds(dd.getMilliseconds() - dd.getDay() * 24 * 3600* 1000);
+                	dd.setHours(0,0,0,0);
+                	return alasql("SELECT * from professional where joining >="+d.getTime() + " and joining <"+dd.getTime());
 
-		if(arr[arr.length - 1] === "week")
-		{
-			if(arr[1] === 'this')
+				}
+            }
+
+            if(arr[arr.length -1 ] === "month")
 			{
+				if(arr[1] === 'this')
+				{
+					console.log("Joined this month . ");
+					let d = new Date();
+					d.setDate(1);
+					d.setHours(0,0,0,0);
+					return alasql("SELECT * from professional where joining >="+d.getTime());
 
+
+				}
+				else
+				{
+                    console.log("Joined last month.");
+                    let d = new Date();
+                    let dd = new Date();
+                    d.setMonth(d.getMonth() - 1);
+                    d.setHours(0,0,0,0);
+                    dd.setDate(1);
+                    dd.setHours(0,0,0,0);
+                    return alasql("SELECT * from professional where joining >="+d.getTime()+" and joining <"+dd.getTime());
+
+				}
+			}
+
+			if(arr[arr.length - 1] === "ago")
+			{
+				console.log("Joined within ? months ago ");
+				let noMonths = parseInt(arr[2]);
+				let d = new Date();
+				d.setMonth(d.getMonth() - noMonths);
+				d.setHours(0,0,0,0);
+				return alasql("SELECT * from professional where joining >="+d.getTime());
 
 			}
+            if(arr[0] === "has")
+            {
+                console.log("has ? years of experience.");
+                let noYears = parseInt(arr[1]);
+
+                let d = new Date();
+
+                d.setFullYear(d.getFullYear() - noYears);
+                d.setHours(0,0,0,0);
+
+                return alasql("SELECT * from professional where joining >="+d.getTime());
+
+            }
+
+
+
+
+        }
+
+        if(str.startsWith("age"))
+		{
+            let arr = str.split(' ');
+            console.log(arr);
+
+
+			if(arr[arr.length - 1] === "older" || arr[arr.length - 1] === "younger")
+			{
+				let age = parseInt(arr[1]);
+                let d = new Date();
+                //let dd = "";
+                d.setFullYear(d.getFullYear() - age);
+                // dd += d.getFullYear()+"-"
+                // 	+(d.getMonth() >= 9 ? d.getMonth()+1 : '0'+(d.getMonth()+1) )+"-"
+                // 							+(d.getDate() >= 10 ? d.getDate() :'0'+d.getDate());
+
+                let dd = d.toISOString().slice(0,10);
+
+
+                if(arr[arr.length - 1] === "older")
+				{
+					console.log("age ? years or older");
+					console.log("Birth Year before "+dd);
+					return alasql("SELECT * from emp where birthday <=\""+dd+"\"");
+
+				}
+				else
+				{
+					console.log("age ? years or younger ");
+                    console.log("Birth Year after "+dd);
+                    return alasql("SELECT * from emp where birthday >=\""+dd+"\"");
+
+
+
+				}
+
+			}
+			else
+			{
+				let lowAge = parseInt(arr[1]) ;
+				let highAge = parseInt(arr[3]);
+
+				let dLow = new Date();
+				let dHigh = new Date();
+
+				dLow.setFullYear(dLow.getFullYear() - lowAge);
+				dHigh.setFullYear(dHigh.getFullYear() - highAge);
+
+				let ddLow = dLow.toISOString().slice(0,10);
+				let ddHigh = dHigh.toISOString().slice(0,10);
+
+				console.log("age ? - ? year");
+				console.log("From "+ddHigh+" ~ "+ddLow);
+
+                return alasql("SELECT * from emp where birthday >=\""+ddHigh+"\" and birthday <= \""+ddLow+"\"");
+
+			}
+
+
 		}
+		if(str.startsWith("knows"))
+		{
+			let arr = str.split(' ');
+
+            console.log(arr);
+
+            arr.splice(0,1);
+            let empSkilled = alasql("SELECT distinct emp from skill");
+
+            for(let i = 0;i<arr.length;i++)
+			{
+				if(arr[i] !== ",")
+				{
+					let tempSkilled = alasql("SELECT distinct emp from skill where name = \""+arr[i]+"\"");
+
+                    for(let j =0;j<empSkilled.length ;j++)
+                    {
+                        let isFound = false;
+                        for(let k =0;k<tempSkilled.length ; k++)
+                        {
+                            if(empSkilled[j]["emp"] === tempSkilled[k]["emp"])
+                            {
+                            	empSkilled[j]["id"] = empSkilled[j]["emp"];
+                                isFound = true;
+                                break;
+                            }
+                        }
+                        if(!isFound)
+                        {
+                            empSkilled.splice(j,1);
+                            j--;
+                        }
+                    }
+
+				}
+			}
+
+
+			console.log(empSkilled);
+
+            return empSkilled;
+
+
+
+        }
+
+
 	}
 
+
+
+
 }
+
+
 
 function getIntersection(t1,t2,t3) {
 	t1= t1.sort();
