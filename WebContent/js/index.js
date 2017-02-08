@@ -16,14 +16,38 @@ var q5 = $.url().param('q5');
 $('input[name="q5"]').val(q5);
 
 
+var emps;
 
+
+$("#add_payroll_submit").on('click',
+	function () {
+	let pay_name = $("#id_payroll_item").val();
+	let pay_amount = $("#id_payroll_amount").val();
+	let pay_type = $('#inlineRadio1').is(':checked') === true ? "plus" : "minus" ;
+	let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] +1;
+
+	for(let i =0;i<emps.length ; i++) {
+
+        alasql('INSERT INTO payroll VALUES(?,?,?,?,?);', [pay_id+i , emps[i]["id"] , pay_name,pay_amount,pay_type]);
+
+    }
+
+	//alert(pay_name+"\n"+pay_amount+"\n"+pay_type+"\n"+pay_id);
+
+
+
+
+
+    }
+
+);
 
 
 console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
 var directSearchJson = JSON.parse(localStorage.getItem("directSearchJson"));
 
 
-var emps;
+
 
 if(q3 !== undefined) {
     emps = alasql('SELECT * FROM emp', []);
@@ -119,7 +143,7 @@ if(q3 !== undefined) {
         }
 	}
 
-	let linkPayroll = "add-payroll.html?p=";
+	let linkPayroll = "change-payroll.html?p=";
 
 	for(let i =0;i<emps.length ; i++)
 	{
@@ -130,9 +154,7 @@ if(q3 !== undefined) {
 		}
 
 	}
-    $("#button_add_payroll").attr("href",linkPayroll);
-
-
+    $("#button_change_payroll").attr("href",linkPayroll);
 
 
 

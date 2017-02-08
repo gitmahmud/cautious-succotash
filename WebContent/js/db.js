@@ -95,9 +95,12 @@ DB.load = function() {
     var ppayroll =  alasql.promise('SELECT MATRIX * FROM CSV("data/EMP-PAY.csv", {headers: true})').then(
         function(payrolls) {
             for (var i = 0; i < payrolls.length; i++) {
+                // console.log(payrolls[i]);
                 alasql('INSERT INTO payroll VALUES(?,?,?,?,?);', payrolls[i]);
             }
         });
+
+
 
 
     // reload html
@@ -185,9 +188,11 @@ DB.load = function() {
 
         localStorage.setItem("directSearchJson" , JSON.stringify(directSearchJson));
 
-        window.location.reload(true);
+       window.location.reload(true);
 
     });
+
+
 
 
 
@@ -222,6 +227,9 @@ try {
 	alasql('ATTACH localStorage DATABASE EMP');
 	alasql('USE EMP');
 	DB.load();
+
+
+
 }
 
 
