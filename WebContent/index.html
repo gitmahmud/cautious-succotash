@@ -133,11 +133,27 @@
                             <div class="form-group">
 
                                 <label for="id_payroll_item">Payroll item</label>
-                                <input  type="text" class="form-control" placeholder="Name" id="id_payroll_item">
+                                <input type="text" class="form-control" placeholder="Name" id="id_payroll_item">
                             </div>
-                            <div class="form-group">
-                                <label for="id_payroll_amount">Payroll amount</label>
-                                <input  type="number" class="form-control" placeholder="Amount" id="id_payroll_amount" min="0">
+                            <div class="form-group form-inline">
+                                <label for="id_modal_select_option">Balance type :</label>
+                                <select class="form-control" id="id_modal_select_option">
+                                    <option>Payroll Amount</option>
+                                    <option>Percentage of another payroll item</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="form-group" id="div_id_modal_pay_amount">
+
+                                <input type="number" class="form-control" placeholder="Amount" id="id_model_pay_amount"
+                                       min="0">
+                            </div>
+                            <div class="form-group form-inline" id="div_id_modal_add_pay_item_select" style="display: none">
+                                <input type="number" class="form-control " placeholder="%"  min="0" value="0" id="id_modal_input_percentage">
+                                <label for="id_modal_add_pay_item_select"> % of </label>
+                                <select class="form-control" id="id_modal_add_pay_item_select">
+
+                                </select>
                             </div>
 
                             <div>
@@ -156,7 +172,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal" id="add_payroll_submit">Add</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal" id="add_payroll_submit">Add
+                        </button>
                     </div>
                 </div>
             </div>
@@ -164,7 +181,8 @@
         <!--<a href="add-payroll.html" class="btn btn-lg btn-primary" style="margin-left: 20%" id="button_add_payroll">-->
         <!--<span class="glyphicon glyphicon-yen" >Add new payroll</span>-->
         <!--</a>-->
-        <a href="change-payroll.html" class="btn btn-lg btn-primary" style="margin-left: 40%" id="button_change_payroll">
+        <a href="change-payroll.html" class="btn btn-lg btn-primary" style="margin-left: 40%"
+           id="button_change_payroll">
             <span class="glyphicon glyphicon-tasks"> Change Payroll </span>
         </a>
 
@@ -182,6 +200,30 @@
             $('#more_search_button').hide();
 
         }
+
+    });
+
+    $('#id_modal_select_option').change(function () {
+
+        if($(this).find(":selected").text() === "Payroll Amount"){
+
+           $(" #div_id_modal_pay_amount" ).show();
+           $(" #div_id_modal_add_pay_item_select" ).hide();
+
+        }
+        else {
+
+            $(" #div_id_modal_pay_amount" ).hide();
+            $(" #div_id_modal_add_pay_item_select" ).show();
+
+
+        }
+
+
+
+
+
+
 
     });
 

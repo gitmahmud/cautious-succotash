@@ -19,18 +19,53 @@ $('input[name="q5"]').val(q5);
 var emps;
 
 
+
 $("#add_payroll_submit").on('click',
 	function () {
+
+
+
 	let pay_name = $("#id_payroll_item").val();
-	let pay_amount = $("#id_payroll_amount").val();
 	let pay_type = $('#inlineRadio1').is(':checked') === true ? "plus" : "minus" ;
-	let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] +1;
 
-	for(let i =0;i<emps.length ; i++) {
 
-        alasql('INSERT INTO payroll VALUES(?,?,?,?,?);', [pay_id+i , emps[i]["id"] , pay_name,pay_amount,pay_type]);
+	if($('#id_modal_select_option').find(":selected").text() === "Payroll Amount"){
+        let pay_amount = parseInt($("#id_model_pay_amount").val());
+        console.log("pay amount "+pay_amount);
 
-    }
+
+        let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] +1;
+
+        for(let i =0;i<emps.length ; i++) {
+
+            alasql('INSERT INTO payroll VALUES(?,?,?,?,?);', [pay_id+i , emps[i]["id"] , pay_name,pay_amount,pay_type]);
+
+        }
+	}
+	else
+	{
+
+        let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] +1;
+        let pay_existing = $('#id_modal_add_pay_item_select').find(":selected").text() ;
+        let percentAmount = parseInt($('#id_modal_input_percentage').val())/100;
+
+        console.log("Percent "+percentAmount);
+
+        for(let i =0;i<emps.length ;i++)
+		{
+			let pay_amount = alasql("SELECT amount from payroll where emp= ?  and item= ? ", [ emps[i]["id"],pay_existing ] )[0]["amount"]
+								* percentAmount ;
+            console.log("pay amount "+pay_amount);
+
+			alasql("INSERT INTO payroll VALUES(?,?,?,?,?);",[ pay_id+i , emps[i]["id"] , pay_name , pay_amount , pay_type ]);
+
+		}
+
+
+
+	}
+
+
 
 	//alert(pay_name+"\n"+pay_amount+"\n"+pay_type+"\n"+pay_id);
 
@@ -153,9 +188,54 @@ if(q3 !== undefined) {
 			linkPayroll += ",";
 		}
 
+
 	}
     $("#button_change_payroll").attr("href",linkPayroll);
 
+
+	let arr_pay_items = [];
+	let first_items = alasql("SELECT * from payroll where emp = "+emps[0]["id"]);
+	for(let i =0;i<first_items.length ; i++)
+	{
+		arr_pay_items.push(first_items[i]["item"]);
+	}
+
+	for(let i = 1 ; i<emps.length;i++)
+	{
+		let otherItems = alasql("SELECT * from payroll where emp = "+emps[i]["id"]);
+
+		let temp_pay_items = [];
+		for(let j = 0 ;j<otherItems.length ; j++)
+		{
+			temp_pay_items.push(otherItems[j]["item"]);
+		}
+
+		for(let j = 0;j<arr_pay_items.length ; j++)
+		{
+			if(temp_pay_items.indexOf(arr_pay_items[j]) === -1)
+			{
+				arr_pay_items.splice(j,1);
+				j--;
+			}
+
+		}
+
+	}
+
+	let selectStr = '';
+	for(let i =0;i<arr_pay_items.length ; i++)
+	{
+		selectStr += '<option>'+arr_pay_items[i]+'</option>';
+
+	}
+	$("#id_modal_add_pay_item_select").append(selectStr);
+
+
+
+
+
+
+	console.log('arr '+arr_pay_items);
 
 
 }
@@ -411,6 +491,61 @@ function parseSearchString(str)
 
 
         }
+        if(str.includes("married"))
+		{
+			if(str.includes("unmarried"))
+			{
+                let married_arr = alasql("SELECT distinct emp from family where relation = 'Wife' or relation = 'Husband' ");
+                let all_emp = alasql("SELECT * from emp");
+
+                for(let i =0;i<married_arr.length ; i++)
+				{
+					for(let j =0;j<all_emp.length ; j++)
+					{
+						if(married_arr[i]["emp"] === all_emp[j]["id"])
+						{
+							all_emp.splice(j,1);
+							break;
+						}
+
+
+					}
+				}
+				return all_emp;
+
+			}
+			if(str.includes("no")){
+				let noChildren =alasql("SELECT distinct emp from family where relation='Daughter' or relation='Son' ");
+                let all_emp = alasql("SELECT * from emp");
+
+                for(let i =0;i<noChildren.length ; i++)
+                {
+                    for(let j =0;j<all_emp.length ; j++)
+                    {
+                        if(noChildren[i]["emp"] === all_emp[j]["id"])
+                        {
+                            all_emp.splice(j,1);
+                            break;
+                        }
+
+                    }
+                }
+
+                return all_emp;
+
+			}
+			else {
+                let hasChildren =alasql("SELECT distinct emp AS id from family where relation='Daughter' or relation='Son' ");
+
+                return hasChildren;
+
+
+			}
+
+
+
+
+		}
 
 
 	}

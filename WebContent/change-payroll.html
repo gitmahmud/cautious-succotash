@@ -122,46 +122,33 @@
 
 <script src="js/change-payroll.js"></script>
 <script>
-    //    $("#_select_amount_percentage").change(function () {
-    //
-    //        if($(".class_select_amount_percentage").find(":selected").text() ==="By Amount")
-    //        {
-    //            $(".div_change_amount").show();
-    //            $(".div_change_percentage").hide();
-    //
-    //        }
-    //        else
-    //        {
-    //            $(".div_change_amount").hide();
-    //            $(".div_change_percentage").show();
-    //        }
-    //
-    //    });
+
+    $(" .class_col_3 ").change(function () {
+
+        let arr = $(this).attr("class").split(" ");
+        let arr_row = arr[arr.length - 1];
+        console.log(arr_row);
+        //$(this).find("class")
+
+        if($(this).find(":selected").text() === "By Amount"){
+
+            $(" .class_div_amount ."+arr_row).parent().show();
+            $(" .class_div_percentage ."+arr_row).parent().hide();
+
+        }
+        else {
+
+            $(" .class_div_percentage ."+arr_row).parent().show()
+
+            $(" .class_div_amount ."+arr_row).parent().hide();
+            //console.log($(" div .class_div_percentage ."+arr_row));
 
 
-        $('div[id^="id_select_amount_percentage_"]').each(function (index) {
-            console.log(index + " " );
+        }
 
-//
-//                $(this).change(function () {
-//
-//                    if ($(this).find(":selected").text() === "By Amount") {
-////            $(".div_change_amount").show();
-////            $(".div_change_percentage").hide();
-//                        alert(this);
-//
-//                    }
-//                    else {
-////            $(".div_change_amount").hide();
-////            $(".div_change_percentage").show();
-//                        alert("this");
-//                    }
-//
-//
-//                });
-//            });
 
-        });
+    });
+
 
 
 </script>
