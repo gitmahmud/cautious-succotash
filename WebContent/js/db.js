@@ -101,10 +101,22 @@ DB.load = function() {
         });
 
 
+    alasql('DROP TABLE IF EXISTS role_project;');
+    alasql('CREATE TABLE role_project(id INT IDENTITY,name STRING, type STRING );');
+
+    var prole_project =  alasql.promise('SELECT MATRIX * FROM CSV("data/PRJ-ROLE.csv", {headers: true})').then(
+        function(roles_projects) {
+            for (var i = 0; i < roles_projects.length; i++) {
+                // console.log(payrolls[i]);
+                alasql('INSERT INTO role_project VALUES(?,?,?);', roles_projects[i]);
+            }
+        });
+
+
 
 
     // reload html
-    Promise.all([ pemp, paddr, pfamily, pedu, pchoice, pprof,pskill, pproject,ppayroll ]).then(function() {
+    Promise.all([ pemp, paddr, pfamily, pedu, pchoice, pprof,pskill, pproject,ppayroll,prole_project ]).then(function() {
 
     	console.log("here it is!");
     	var directSearchJson = {};

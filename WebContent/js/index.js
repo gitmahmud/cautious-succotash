@@ -16,14 +16,13 @@ var q5 = $.url().param('q5');
 $('input[name="q5"]').val(q5);
 
 
-var emps;
+var emps , arr_task_emp;
+
 
 
 
 $("#add_payroll_submit").on('click',
 	function () {
-
-
 
 	let pay_name = $("#id_payroll_item").val();
 	let pay_type = $('#inlineRadio1').is(':checked') === true ? "plus" : "minus" ;
@@ -76,6 +75,109 @@ $("#add_payroll_submit").on('click',
     }
 
 );
+
+$("#id_skill_sort_btn_asc").on('click',function () {
+
+    arr_task_emp.sort(function (a, b) {
+        return a.skill_avg - b.skill_avg;
+    });
+
+    empSkillExpSortShow(arr_task_emp);
+
+
+});
+
+$("#id_skill_sort_btn_desc").on('click',function () {
+
+    arr_task_emp.sort(function (a, b) {
+        return -a.skill_avg + b.skill_avg;
+    });
+
+    empSkillExpSortShow(arr_task_emp);
+
+
+});
+
+$('#id_experience_sort_btn_asc').on('click',function () {
+
+    arr_task_emp.sort(function (a, b) {
+        return a.joining_time - b.joining_time;
+    });
+
+    empSkillExpSortShow(arr_task_emp);
+
+});
+
+$('#id_experience_sort_btn_desc').on('click',function () {
+
+    arr_task_emp.sort(function (a, b) {
+        return -a.joining_time + b.joining_time;
+    });
+    empSkillExpSortShow(arr_task_emp);
+
+});
+
+$("#hide_emp_checkbox").change(function () {
+    if($('#hide_emp_checkbox').prop('checked')){
+    	$(' .busy_emp_class ').hide();
+
+	}
+	else
+	{
+        $(' .busy_emp_class ').show();
+
+	}
+
+});
+
+
+$("#button_task_next").on('click',function () {
+	let str = '';
+
+	let proj_arr = alasql('SELECT * from role_project where type="project"');
+	let proj_arr_select = '';
+	for(let i = 0; i<proj_arr.length ; i++)
+	{
+		proj_arr_select += '<option>'+proj_arr[i]["name"]+'</option>';
+	}
+
+	$('#id_project_selection').html(proj_arr_select);
+
+	let role_arr = alasql('SELECT * from role_project where type="role"');
+	let role_arr_select ='';
+
+    for(let i = 0; i<role_arr.length ; i++)
+    {
+        role_arr_select += '<option>'+role_arr[i]["name"]+'</option>';
+    }
+
+
+
+	for(let i =0; i<arr_task_emp.length ; i++)
+	{
+		if(arr_task_emp[i]["selectedEmp"] ){
+
+			str+=
+			'<tr>'+
+				'<td>'+arr_task_emp[i]["name"]+'</td>'+
+				'<td>'+
+				'<select>'+role_arr_select	+'</select>'+
+				'</td><td>'+
+            '<div class="form-group">'+
+            '<textarea class="form-control" id="descriptionTextarea" rows="4"></textarea>'+
+			'</div></td>'+
+			'</tr>'
+		}
+	}
+
+	$("#tbody_assign_role").html(str);
+
+});
+
+
+
+
+
 
 
 console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
@@ -230,12 +332,85 @@ if(q3 !== undefined) {
 	}
 	$("#id_modal_add_pay_item_select").append(selectStr);
 
-
-
-
-
-
 	console.log('arr '+arr_pay_items);
+
+	//
+	let arr_skill_sorted,arr_experience_sorted;
+
+	arr_task_emp = [];
+    let join_time_per_level = alasql('SELECT ? - MIN(joining) AS max_join_time from professional ',[new Date().getTime()] )[0]["max_join_time"]/3;
+    console.log(join_time_per_level + typeof join_time_per_level);
+
+
+	for(let i =0;i<emps.length ; i++)
+	{
+		let skill_avg = alasql("SELECT avg(rating) AS point from skill where emp=?",[emps[i]["id"]])[0]["point"];
+		let skill_level ,skill_bg_color;
+		if(skill_avg >4)
+		{
+			skill_level = 'Advanced';
+			skill_bg_color = "bg-success text-white";
+
+		}
+		else if(skill_avg > 3)
+		{
+			skill_level = 'Intermediate';
+            skill_bg_color = "bg-info text-white";
+
+		}
+		else
+		{
+			skill_level = 'Basic';
+            skill_bg_color = "bg-warning text-white" ;
+		}
+
+		let joining_time = alasql("SELECT ? - joining  AS current_join from professional where emp = ?",[ new Date().getTime(),emps[i]["id"] ])[0]["current_join"];
+		let join_level , join_bg_color;
+
+		console.log(emps[i]["id"]+" "+ joining_time);
+
+		if(joining_time > 2*join_time_per_level)
+		{
+			join_level = 'Veteran';
+			join_bg_color = "bg-success text-white";
+
+		}
+		else if(joining_time > join_time_per_level)
+		{
+			join_level = 'Senior';
+            join_bg_color = "bg-info text-white";
+		}
+		else
+		{
+			join_level = 'Junior';
+            join_bg_color = "bg-warning text-white" ;
+        }
+
+        let isBusy = alasql('SELECT * from project where emp=?',[emps[i]["id"]]).length !== 0 ;
+
+		arr_task_emp.push(
+			{
+				"emp_id" : emps[i]["id"],
+				"name" : emps[i]["name"],
+				"skill_level" : skill_level,
+				"experience" : join_level,
+				"skill_bg_color" : skill_bg_color,
+				"join_bg_color" : join_bg_color,
+				"skill_avg" : skill_avg,
+				"joining_time" : joining_time,
+				"is_busy" : isBusy,
+				"selectedEmp" : false
+			}
+
+		);
+
+	}
+
+	arr_task_emp.sort(function (a, b) {
+		return -a.skill_avg + b.skill_avg;
+    });
+
+	empSkillExpSortShow(arr_task_emp);
 
 
 }
@@ -287,7 +462,12 @@ function parseSearchString(str)
 		let sqlStr ='SELECT * from '+directSearchJson[str]["table"]+" where "+directSearchJson[str]["type"]+" LIKE  ?";
 		console.log("//"+sqlStr);
 
-		return alasql('SELECT * from '+directSearchJson[str]["table"]+" where "+directSearchJson[str]["type"]+" LIKE  ?",['%'+str+'%']);
+		if(directSearchJson[str]["table"] === "emp"){
+            return alasql('SELECT * from '+directSearchJson[str]["table"]+" where "+directSearchJson[str]["type"]+" LIKE  ?",['%'+str+'%']);
+		}
+		else {
+            return alasql('SELECT emp AS id from ' + directSearchJson[str]["table"] + " where " + directSearchJson[str]["type"] + " LIKE  ?", ['%' + str + '%']);
+        }
 
 	}
 	else
@@ -555,21 +735,25 @@ function parseSearchString(str)
 
 }
 
+function empSkillExpSortShow(arr_task_emp) {
+	let repStr = '';
+    for(let i =0;i<arr_task_emp.length;i++) {
+        let row_name_emp = "class_task_row_" + arr_task_emp[i]["emp_id"];
+        let empBusyClass= arr_task_emp[i]["is_busy"] ? ' busy_emp_class ' : 'free_emp_class';
+
+		repStr+=
+            '<tr class="'+empBusyClass+'">' +
+            '<td class="col-sm-1"><input type="checkbox" class=" class_task_checkbox ' + row_name_emp + ' " ></td>' +
+            '<td class="col-lg-3">' + arr_task_emp[i]["name"] + '</td>' +
+            '<td class="col-sm-2 ' + arr_task_emp[i]["skill_bg_color"] + ' " >' + arr_task_emp[i]["skill_level"] + '</td>' +
+            '<td class="col-sm-2 ' + arr_task_emp[i]["join_bg_color"] + ' " >' + arr_task_emp[i]["experience"] + '</td>' +
+            '</tr>';
+    }
+
+    $('#tbody_emp_skill_exp').html(repStr);
 
 
-function getIntersection(t1,t2,t3) {
-	t1= t1.sort();
-	t2= t2.sort();
-	t3= t3.sort();
-	console.log("T1 size "+t2);
 
-	let tmp =  t1.filter(function (element) {
-		console.log("el "+element);
-		return t2.indexOf(element) !== -1 && t3.indexOf(element) !== -1 ;
-
-    });
-
-	console.log(tmp);
-	return tmp;
 
 }
+

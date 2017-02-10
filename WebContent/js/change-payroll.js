@@ -87,14 +87,38 @@ $(" .class_col_2 ").on('click', function () {
         let arr = $(this).attr("class").split(" ");
         let arr_row = arr[arr.length - 1];
         let pay_item_name = $(".class_col_0." + arr_row).text();
-        let pay_reset_amount = parseInt($(".class_col_1." + arr_row).val());
+        let reset_warning = $('.btn.class_col_2.' + arr_row).attr("class").split(" ")[1] === "btn-warning";
+        if (reset_warning){
+            if(confirm("This payroll amount is not same for all employees.\nAre you sure to perform this action ?")) {
 
-        console.log(pay_item_name + " " + pay_reset_amount);
+                let pay_reset_amount = parseInt($(".class_col_1." + arr_row).val());
+
+                console.log(pay_item_name + " " + pay_reset_amount);
+
+                for (let i = 0; i < ids.length; i++) {
+                    alasql("UPDATE payroll SET amount = ? WHERE emp = ? and item = ?", [pay_reset_amount, ids[i], pay_item_name]);
+
+                }
+
+
+            }
+            $('.btn.class_col_2.' + arr_row).attr("class"," btn btn-primary class_col_2 "+arr_row);
+
+        }
+        else
+        {
+
+            let pay_reset_amount = parseInt($(".class_col_1." + arr_row).val());
+
+            console.log(pay_item_name + " " + pay_reset_amount);
 
             for (let i = 0; i < ids.length; i++) {
                 alasql("UPDATE payroll SET amount = ? WHERE emp = ? and item = ?", [pay_reset_amount, ids[i], pay_item_name]);
 
             }
+
+        }
+
 
 
     }
@@ -106,59 +130,51 @@ $(" .class_col_6 ").on('click', function () {
         let pay_item_name = $(".class_col_0." + arr_row).text();
 
 
+        if ($(".class_col_3." + arr_row).find(":selected").text() === "By Amount") {
+            let pay_change_amount = parseInt($(".class_col_4." + arr_row).val());
 
-        if($(".class_col_3."+arr_row).find(":selected").text() === "By Amount" )
-        {
-            let pay_change_amount =  parseInt($(".class_col_4." + arr_row).val());
-
-            console.log(pay_item_name +" "+ pay_change_amount);
+            console.log(pay_item_name + " " + pay_change_amount);
 
             if (pay_change_amount < 0) {
                 for (let i = 0; i < ids.length; i++) {
 
-                    alasql("UPDATE payroll SET amount = amount - ? WHERE emp = ? and item = ?", [Math.abs(pay_change_amount) , ids[i], pay_item_name]);
+                    alasql("UPDATE payroll SET amount = amount - ? WHERE emp = ? and item = ?", [Math.abs(pay_change_amount), ids[i], pay_item_name]);
 
                 }
 
             }
             else {
-                for(let i =0;i<ids.length ; i++)
-                {
-                    alasql("UPDATE payroll SET amount = amount + ? WHERE emp = ? and item = ?", [pay_change_amount , ids[i], pay_item_name]);
+                for (let i = 0; i < ids.length; i++) {
+                    alasql("UPDATE payroll SET amount = amount + ? WHERE emp = ? and item = ?", [pay_change_amount, ids[i], pay_item_name]);
 
                 }
 
             }
 
         }
-        else
-        {
-            let pay_change_percent = parseInt($(".class_col_5." + arr_row).val())/100;
+        else {
+            let pay_change_percent = parseInt($(".class_col_5." + arr_row).val()) / 100;
 
-            console.log(pay_item_name+" "+pay_change_percent);
+            console.log(pay_item_name + " " + pay_change_percent);
 
             if (pay_change_percent < 0) {
                 for (let i = 0; i < ids.length; i++) {
 
-                    alasql("UPDATE payroll SET amount = amount * ? WHERE emp = ? and item = ?", [1-Math.abs(pay_change_percent) , ids[i], pay_item_name]);
+                    alasql("UPDATE payroll SET amount = amount * ? WHERE emp = ? and item = ?", [1 - Math.abs(pay_change_percent), ids[i], pay_item_name]);
 
                 }
 
             }
             else {
-                for(let i =0;i<ids.length ; i++)
-                {
-                    alasql("UPDATE payroll SET amount = amount + amount * ? WHERE emp = ? and item = ?", [pay_change_percent , ids[i], pay_item_name]);
+                for (let i = 0; i < ids.length; i++) {
+                    alasql("UPDATE payroll SET amount = amount + amount * ? WHERE emp = ? and item = ?", [pay_change_percent, ids[i], pay_item_name]);
 
                 }
 
             }
 
 
-
         }
-
-
 
 
     }

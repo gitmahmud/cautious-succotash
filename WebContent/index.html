@@ -115,7 +115,8 @@
 
     <div class="clearfix" style="margin: 10px 0;" id="business_op">
 
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addPayrollModal">Add new
+        <button type="button" class="btn btn-primary btn-lg " data-toggle="modal"
+                data-target="#addPayrollModal"><span class="glyphicon glyphicon-credit-card"></span>Add new
             payroll
         </button>
         <div id="addPayrollModal" class="modal fade" role="dialog">
@@ -148,8 +149,10 @@
                                 <input type="number" class="form-control" placeholder="Amount" id="id_model_pay_amount"
                                        min="0">
                             </div>
-                            <div class="form-group form-inline" id="div_id_modal_add_pay_item_select" style="display: none">
-                                <input type="number" class="form-control " placeholder="%"  min="0" value="0" id="id_modal_input_percentage">
+                            <div class="form-group form-inline" id="div_id_modal_add_pay_item_select"
+                                 style="display: none">
+                                <input type="number" class="form-control " placeholder="%" min="0" value="0"
+                                       id="id_modal_input_percentage">
                                 <label for="id_modal_add_pay_item_select"> % of </label>
                                 <select class="form-control" id="id_modal_add_pay_item_select">
 
@@ -178,15 +181,124 @@
                 </div>
             </div>
         </div>
+
+
         <!--<a href="add-payroll.html" class="btn btn-lg btn-primary" style="margin-left: 20%" id="button_add_payroll">-->
         <!--<span class="glyphicon glyphicon-yen" >Add new payroll</span>-->
         <!--</a>-->
-        <a href="change-payroll.html" class="btn btn-lg btn-primary" style="margin-left: 40%"
-           id="button_change_payroll">
-            <span class="glyphicon glyphicon-tasks"> Change Payroll </span>
-        </a>
 
+        <button type="button" class="btn btn-success btn-lg  " style="margin-left: 25%" data-toggle="modal"
+                data-target="#modalAssignTask">
+            <span class="glyphicon glyphicon-tasks">Assign Task</span>
+        </button>
+        <div id="modalAssignTask" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title text-primary">Select Employees</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="checkbox" id="hide_emp_checkbox"><label for="hide_emp_checkbox">Hide busy
+                        employees</label>
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="col-sm-1"></th>
+                                <th class="col-sm-3">Employee Name</th>
+                                <th class="col-sm-2">Skill Level
+                                    <div>
+                                        <button class="btn btn-xs btn-info" id="id_skill_sort_btn_asc"><span
+                                                class="glyphicon glyphicon-chevron-down"></span></button>
+                                        <button class="btn btn-xs btn-info" id="id_skill_sort_btn_desc"><span
+                                                class="glyphicon glyphicon-chevron-up"></span></button>
+                                    </div>
+                                </th>
+                                <th class="col-sm-2">Experience
+                                    <div>
+                                        <button class="btn btn-xs btn-info" id="id_experience_sort_btn_asc"><span
+                                                class="glyphicon glyphicon-chevron-down"></span></button>
+                                        <button class="btn btn-xs btn-info" id="id_experience_sort_btn_desc"><span
+                                                class="glyphicon glyphicon-chevron-up"></span></button>
+                                    </div>
+                                </th>
+
+                            </tr>
+                            </thead>
+                            <tbody id="tbody_emp_skill_exp">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+
+
+                            <a href="#modalAssignEmployee" data-toggle="modal" data-dismiss="modal">
+                                <button type="button" class="btn btn-default text-center " id="button_task_next">Next</button>
+
+                            </a>
+
+
+
+
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div id="modalAssignEmployee" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Assign role to employees</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group form-inline">
+                            <label for="id_project_selection">Project name</label>
+                            <select class="form-control" id="id_project_selection">
+
+                            </select>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                            <th class="col-sm-2">Employee Name</th>
+                            <th class="col-sm-2">Role</th>
+                            <th class="col-sm-4">Description</th>
+                            </thead>
+                            <tbody id="tbody_assign_role">
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Finish</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <a href="change-payroll.html" class="btn btn-lg btn-warning pull-right"
+           id="button_change_payroll">
+            <span class="glyphicon glyphicon-pencil"> Change Payroll </span>
+        </a>
     </div>
+
+</div>
 </div>
 <script src="js/index.js"></script>
 <script>
@@ -205,24 +317,51 @@
 
     $('#id_modal_select_option').change(function () {
 
-        if($(this).find(":selected").text() === "Payroll Amount"){
+        if ($(this).find(":selected").text() === "Payroll Amount") {
 
-           $(" #div_id_modal_pay_amount" ).show();
-           $(" #div_id_modal_add_pay_item_select" ).hide();
+            $(" #div_id_modal_pay_amount").show();
+            $(" #div_id_modal_add_pay_item_select").hide();
 
         }
         else {
 
-            $(" #div_id_modal_pay_amount" ).hide();
-            $(" #div_id_modal_add_pay_item_select" ).show();
+            $(" #div_id_modal_pay_amount").hide();
+            $(" #div_id_modal_add_pay_item_select").show();
 
 
         }
 
 
+    });
 
+    $(' .class_task_checkbox ').change(function () {
+        console.log("Clck");
+        let arr = $(this).attr("class").split(",");
+        let arr2 = arr[arr.length - 1].split("_");
+        let emp_id = parseInt(arr2[arr2.length - 1]);
 
+        console.log("Selected/Unselected  " + emp_id);
+        if ($(this).prop('checked')) {
+            for (let i = 0; i < arr_task_emp.length; i++) {
+                if (arr_task_emp[i]["emp_id"] === emp_id) {
+                    arr_task_emp[i]["selectedEmp"] = true;
+                    break;
+                }
 
+            }
+
+        }
+        else {
+
+            for (let i = 0; i < arr_task_emp.length; i++) {
+                if (arr_task_emp[i]["emp_id"] === emp_id) {
+                    arr_task_emp[i]["selectedEmp"] = false;
+                    break;
+                }
+
+            }
+
+        }
 
 
     });
