@@ -80,12 +80,12 @@ DB.load = function() {
     //employee project
 
     alasql('DROP TABLE IF EXISTS project;');
-    alasql('CREATE TABLE project(id INT IDENTITY,emp STRING, name STRING, role STRING, description STRING);');
+    alasql('CREATE TABLE project(id INT IDENTITY,emp STRING, name STRING, role STRING, description STRING,created STRING);');
 
     var pproject =  alasql.promise('SELECT MATRIX * FROM CSV("data/EMP-PRJ.csv", {headers: true})').then(
         function(projects) {
             for (var i = 0; i < projects.length; i++) {
-                alasql('INSERT INTO project VALUES(?,?,?,?,?);', projects[i]);
+                alasql('INSERT INTO project VALUES(?,?,?,?,?,?);', projects[i]);
             }
         });
 

@@ -65,8 +65,8 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th class="col-sm-4">Payroll item</th>
-            <th class="col-sm-3">Reset payroll amount</th>
+            <th class="col-sm-3">Payroll item</th>
+            <th class="col-sm-4">Reset payroll amount</th>
             <th class="col-sm-5">Increase/decrease payroll amount</th>
         </tr>
         </thead>
@@ -135,16 +135,43 @@
             $(" .class_div_amount ."+arr_row).parent().show();
             $(" .class_div_percentage ."+arr_row).parent().hide();
 
+
         }
-        else {
+        else  {
 
             $(" .class_div_percentage ."+arr_row).parent().show()
 
             $(" .class_div_amount ."+arr_row).parent().hide();
+
             //console.log($(" div .class_div_percentage ."+arr_row));
+
+        }
+
+
+    });
+
+    $(" .class_col_select_another_item_percentage ").change(function () {
+
+        let arr = $(this).attr("class").split(" ");
+        let arr_row = arr[arr.length - 1];
+
+        if($(this).find(":selected").text() === "By Amount"){
+
+            $(" .class_div_reset_by_amount ."+arr_row).parent().show();
+            $(" .class_div_another_item_percentage ."+arr_row).parent().hide();
 
 
         }
+        else  {
+
+            $(" .class_div_another_item_percentage ."+arr_row).parent().show()
+
+            $(" .class_div_reset_by_amount ."+arr_row).parent().hide();
+
+            //console.log($(" div .class_div_percentage ."+arr_row));
+
+        }
+
 
 
     });

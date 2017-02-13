@@ -46,14 +46,27 @@ $("#add_payroll_submit").on('click',
 
         let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] +1;
         let pay_existing = $('#id_modal_add_pay_item_select').find(":selected").text() ;
-        let percentAmount = parseInt($('#id_modal_input_percentage').val())/100;
+        let percentAmountString = $('#id_modal_input_percentage').val();
+        let percentAmount;
+        if(percentAmountString.indexOf(".") === -1 )
+		{
+			percentAmount = parseInt(percentAmountString)/100;
+
+		}
+		else
+		{
+            percentAmount = parseFloat(percentAmountString)/100;
+
+		}
+		console.log("Percent Amount "+percentAmount);
+
 
         console.log("Percent "+percentAmount);
 
         for(let i =0;i<emps.length ;i++)
 		{
-			let pay_amount = alasql("SELECT amount from payroll where emp= ?  and item= ? ", [ emps[i]["id"],pay_existing ] )[0]["amount"]
-								* percentAmount ;
+			let pay_amount = (alasql("SELECT amount from payroll where emp= ?  and item= ? ", [ emps[i]["id"],pay_existing ] )[0]["amount"]
+								* percentAmount).toFixed(2) ;
             console.log("pay amount "+pay_amount);
 
 			alasql("INSERT INTO payroll VALUES(?,?,?,?,?);",[ pay_id+i , emps[i]["id"] , pay_name , pay_amount , pay_type ]);
@@ -67,6 +80,11 @@ $("#add_payroll_submit").on('click',
 
 
 	//alert(pay_name+"\n"+pay_amount+"\n"+pay_type+"\n"+pay_id);
+
+       window.location.reload(true);
+        $("#id_payroll_item").val('');
+        $("#id_model_pay_amount").val(0);
+        $('#id_modal_select_option').show();
 
 
 
@@ -157,20 +175,58 @@ $("#button_task_next").on('click',function () {
 	{
 		if(arr_task_emp[i]["selectedEmp"] ){
 
+            let indexDesgn = role_arr_select.indexOf(alasql('SELECT desgn from emp where id = ?',[arr_task_emp[i]["emp_id"]])[0]["desgn"]);
+            if(indexDesgn >= 0 ) {
+                role_arr_select = role_arr_select.slice(0, indexDesgn - 1) + " selected" + role_arr_select.slice(indexDesgn - 1, role_arr_select.length);
+            }
+
 			str+=
 			'<tr>'+
 				'<td>'+arr_task_emp[i]["name"]+'</td>'+
 				'<td>'+
-				'<select>'+role_arr_select	+'</select>'+
+				'<select class="class_select_checkbox_role class_assign_employee_'+arr_task_emp[i]["emp_id"]+'">'+role_arr_select	+'</select>'+
 				'</td><td>'+
             '<div class="form-group">'+
-            '<textarea class="form-control" id="descriptionTextarea" rows="4"></textarea>'+
+            '<textarea class="form-control class_select_description_role class_assign_employee_'+arr_task_emp[i]["emp_id"]+'"  rows="4"></textarea>'+
 			'</div></td>'+
 			'</tr>'
 		}
 	}
 
 	$("#tbody_assign_role").html(str);
+
+});
+
+
+$('#modal_add_task_finish').on('click' , function () {
+	let proj_name = $('#id_project_selection').find(":selected").text();
+	for(let i =0; i <arr_task_emp.length ; i++)
+	{
+		if(arr_task_emp[i]["selectedEmp"]){
+
+			let currentRole = $('.class_select_checkbox_role.class_assign_employee_'+arr_task_emp[i]["emp_id"]).find(":selected").text();
+			let currentDescription = $('.class_select_description_role.class_assign_employee_'+arr_task_emp[i]["emp_id"]).val();
+
+			// if(alasql('SELECT * from project where emp=?',[arr_task_emp[i]["emp_id"]]).length !== 0 ) {
+            //
+             //    alasql('UPDATE project SET name = ? , role= ? , description = ? WHERE emp=?',[proj_name , currentRole,currentDescription , arr_task_emp[i]["emp_id"]]);
+            // }
+            // else
+			// {
+			let row_id = alasql('SELECT MAX(id)+1 AS row_id from project')[0]['row_id'];
+			alasql('INSERT INTO project VALUES(?,?,?,?,?,?);', [row_id, arr_task_emp[i]["emp_id"], proj_name, currentRole, currentDescription,new Date().getTime()]);
+
+			//}
+
+		}
+
+	}
+
+
+window.location.reload(true);
+
+
+
 
 });
 
