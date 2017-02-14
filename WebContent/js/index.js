@@ -612,8 +612,9 @@ function parseSearchString(str)
 
                 d.setFullYear(d.getFullYear() - noYears);
                 d.setHours(0,0,0,0);
+                console.log("D "+d.getTime());
 
-                return alasql("SELECT * from professional where joining >="+d.getTime());
+                return alasql("SELECT * from professional where joining <="+d.getTime());
 
             }
 
@@ -747,31 +748,36 @@ function parseSearchString(str)
 
 					}
 				}
+				console.log("unmarried");
 				return all_emp;
 
 			}
 			if(str.includes("no")){
-				let noChildren =alasql("SELECT distinct emp from family where relation='Daughter' or relation='Son' ");
-                let all_emp = alasql("SELECT * from emp");
+				let hasChildren =alasql("SELECT distinct emp AS id from family where relation='Daughter' or relation='Son' ");
+                let isMarried = alasql("SELECT distinct emp AS id from family where relation='Husband' or relation= 'Wife' ");
 
-                for(let i =0;i<noChildren.length ; i++)
+                for(let i =0;i<isMarried.length ; i++)
                 {
-                    for(let j =0;j<all_emp.length ; j++)
+                    for(let j =0;j<hasChildren.length ; j++)
                     {
-                        if(noChildren[i]["emp"] === all_emp[j]["id"])
+                        if(isMarried[i]["id"] === hasChildren[j]["id"])
                         {
-                            all_emp.splice(j,1);
+                            isMarried.splice(i,1);
+                            i--;
                             break;
                         }
-
                     }
                 }
+                console.log("no children "+hasChildren.length)
+                console.log("married and has no children . ",isMarried.length);
 
-                return all_emp;
+                return isMarried;
 
 			}
 			else {
                 let hasChildren =alasql("SELECT distinct emp AS id from family where relation='Daughter' or relation='Son' ");
+
+                console.log("married and has children .");
 
                 return hasChildren;
 

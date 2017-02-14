@@ -14,6 +14,7 @@ $('#pspt_date').text(emp.pspt_date);
 $('#pspt_name').text(emp.pspt_name);
 $('#rental').text(DB.choice(emp.rental));
 $('#employee_department').text(emp.dept);
+$('#employee_designation').text(emp.desgn);
 
 
 

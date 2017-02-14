@@ -127,9 +127,11 @@ $(" .class_col_2 ").on('click', function () {
 
                     }
 
+                    $('.btn.class_col_2.' + arr_row).attr("class", " btn btn-primary class_col_2 " + arr_row);
+
 
                 }
-                $('.btn.class_col_2.' + arr_row).attr("class", " btn btn-primary class_col_2 " + arr_row);
+
 
             }
             else {

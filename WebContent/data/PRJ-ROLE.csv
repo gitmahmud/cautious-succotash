@@ -1,10 +1,14 @@
 ID,NAME,TYPE
-1,proj1,project
-2,proj2,project
-3,proj3,project
-4,proj4,project
-5,proj5,project
-6,proj6,project
+1,overseas client deal,project
+2,product x,project
+3,recruitment in NUS,project
+4,Software Engineer,role
+5,Senior Software Engineer,role
+6,UI Designer,role
 7,Manager,role
 8,Team lead,role
 9,Team member,role
+10,Member,role
+11,UI Designer,role
+11,Lead UI Designer,role
+
