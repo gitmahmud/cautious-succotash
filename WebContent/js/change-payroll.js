@@ -136,6 +136,7 @@ $(" .class_col_2 ").on('click', function () {
             }
             else {
 
+
                 let pay_reset_amount_string = $(".class_col_1." + arr_row).val();
 
                 let pay_reset_amount = pay_reset_amount_string.indexOf(".") === -1 ? parseInt(pay_reset_amount_string) : parseFloat(pay_reset_amount_string);
@@ -160,7 +161,11 @@ $(" .class_col_2 ").on('click', function () {
 
             for (let i = 0; i < ids.length; i++) {
 
-                let pay_reset_amount = (alasql("SELECT amount from payroll where emp = ? and item=?",[ids[i],pay_reset_another_item_name])[0]["amount"] * pay_reset_percentage).toFixed(2);
+
+                console.log("Type pf amount "+typeof (alasql("SELECT amount from payroll where emp = ? and item=?",[ids[i],pay_reset_another_item_name])[0]["amount"]));
+                console.log("Type of percent "+typeof pay_reset_percentage);
+                let pay_reset_amount = parseFloat( ( alasql("SELECT amount from payroll where emp = ? and item=?",[ids[i],pay_reset_another_item_name])[0]["amount"] * pay_reset_percentage ).toFixed(2));
+                console.log(typeof pay_reset_amount);
                 alasql("UPDATE payroll SET amount = ? WHERE emp = ? and item = ?", [pay_reset_amount , ids[i] , pay_item_name]);
             }
 

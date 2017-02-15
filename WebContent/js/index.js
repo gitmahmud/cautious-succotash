@@ -21,6 +21,7 @@ var emps , arr_task_emp;
 
 
 
+
 $("#add_payroll_submit").on('click',
 	function () {
 
@@ -65,9 +66,9 @@ $("#add_payroll_submit").on('click',
 
         for(let i =0;i<emps.length ;i++)
 		{
-			let pay_amount = (alasql("SELECT amount from payroll where emp= ?  and item= ? ", [ emps[i]["id"],pay_existing ] )[0]["amount"]
-								* percentAmount).toFixed(2) ;
-            console.log("pay amount "+pay_amount);
+			let pay_amount = parseFloat((alasql("SELECT amount from payroll where emp= ?  and item= ? ", [ emps[i]["id"],pay_existing ] )[0]["amount"]
+								* percentAmount).toFixed(2)) ;
+            //alert("pay amount "+pay_amount+" type "+typeof pay_amount);
 
 			alasql("INSERT INTO payroll VALUES(?,?,?,?,?);",[ pay_id+i , emps[i]["id"] , pay_name , pay_amount , pay_type ]);
 
@@ -134,6 +135,9 @@ $('#id_experience_sort_btn_desc').on('click',function () {
     empSkillExpSortShow(arr_task_emp);
 
 });
+
+
+
 
 $("#hide_emp_checkbox").change(function () {
     if($('#hide_emp_checkbox').prop('checked')){
@@ -802,10 +806,11 @@ function empSkillExpSortShow(arr_task_emp) {
     for(let i =0;i<arr_task_emp.length;i++) {
         let row_name_emp = "class_task_row_" + arr_task_emp[i]["emp_id"];
         let empBusyClass= arr_task_emp[i]["is_busy"] ? ' busy_emp_class ' : 'free_emp_class';
+        let checkboxText = arr_task_emp[i]["selectedEmp"] ? 'checked' : '';
 
 		repStr+=
             '<tr class="'+empBusyClass+'">' +
-            '<td class="col-sm-1"><input type="checkbox" class=" class_task_checkbox ' + row_name_emp + ' " ></td>' +
+            '<td class="col-sm-1"><input type="checkbox" class=" class_task_checkbox ' + row_name_emp + ' " '+checkboxText+' ></td>' +
             '<td class="col-lg-3">' + arr_task_emp[i]["name"] + '</td>' +
             '<td class="col-sm-2 ' + arr_task_emp[i]["skill_bg_color"] + ' " >' + arr_task_emp[i]["skill_level"] + '</td>' +
             '<td class="col-sm-2 ' + arr_task_emp[i]["join_bg_color"] + ' " >' + arr_task_emp[i]["experience"] + '</td>' +
@@ -814,8 +819,47 @@ function empSkillExpSortShow(arr_task_emp) {
 
     $('#tbody_emp_skill_exp').html(repStr);
 
+    $(' .class_task_checkbox ').change(function () {
+        console.log("Clck");
+        let arr = $(this).attr("class").split(",");
+        let arr2 = arr[arr.length - 1].split("_");
+        let emp_id = parseInt(arr2[arr2.length - 1]);
+
+
+        if ($(this).prop('checked')) {
+            console.log("Selected  " + emp_id);
+
+            for (let i = 0; i < arr_task_emp.length; i++) {
+                if (arr_task_emp[i]["emp_id"] === emp_id) {
+                    arr_task_emp[i]["selectedEmp"] = true;
+                    break;
+                }
+
+            }
+
+        }
+        else {
+            console.log("UnSelected  " + emp_id);
+            $(this).prop('checked',false);
+
+            for (let i = 0; i < arr_task_emp.length; i++) {
+                if (arr_task_emp[i]["emp_id"] === emp_id) {
+                    arr_task_emp[i]["selectedEmp"] = false;
+                    break;
+                }
+
+            }
+
+        }
+        console.log(arr_task_emp);
+
+
+    });
+
 
 
 
 }
+
+
 

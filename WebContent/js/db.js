@@ -143,7 +143,7 @@ DB.load = function() {
             };
         }
 
-        res = alasql("SELECT name FROM project GROUP BY name");
+        res = alasql("SELECT name FROM role_project where type='project' GROUP BY name");
 
         for(let i =0;i<res.length; i++)
         {

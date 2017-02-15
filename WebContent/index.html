@@ -333,15 +333,16 @@
 
 
     });
-
     $(' .class_task_checkbox ').change(function () {
         console.log("Clck");
         let arr = $(this).attr("class").split(",");
         let arr2 = arr[arr.length - 1].split("_");
         let emp_id = parseInt(arr2[arr2.length - 1]);
 
-        console.log("Selected/Unselected  " + emp_id);
+
         if ($(this).prop('checked')) {
+            console.log("Selected  " + emp_id);
+
             for (let i = 0; i < arr_task_emp.length; i++) {
                 if (arr_task_emp[i]["emp_id"] === emp_id) {
                     arr_task_emp[i]["selectedEmp"] = true;
@@ -352,6 +353,8 @@
 
         }
         else {
+            console.log("UnSelected  " + emp_id);
+            $(this).prop('checked',false);
 
             for (let i = 0; i < arr_task_emp.length; i++) {
                 if (arr_task_emp[i]["emp_id"] === emp_id) {
@@ -362,9 +365,11 @@
             }
 
         }
+        console.log(arr_task_emp);
 
 
     });
+
 
 
 </script>
