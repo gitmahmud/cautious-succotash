@@ -14,21 +14,50 @@ $('#pspt_date').text(emp.pspt_date);
 $('#pspt_name').text(emp.pspt_name);
 $('#rental').text(DB.choice(emp.rental));
 $('#employee_department').text(emp.dept);
+$('#employee_designation').text(emp.desgn);
+
 console.log("Employee Id "+id);
+
+
+
+
+
 
 var emp_personal_extended = alasql('SELECT * FROM professional WHERE emp=?', [ id])[0];
 
 console.log('a '+emp_personal_extended.nationality);
 console.log('b '+emp_personal_extended.bank_account);
+console.log("Employee Id "+id);
+
 $('#joining_date').text(getDateFromMS(emp_personal_extended.joining));
 $('#nationality').text(emp_personal_extended.nationality);
 $('#bank_account').text(emp_personal_extended.bank_account);
 
-var emp_project = alasql('SELECT * FROM project WHERE emp=?', [ id])[0];
+var emp_projects = alasql('SELECT * FROM project WHERE emp=?', [ id]);
 
-$('#project_name').text(emp_project.name);
-$('#project_description').text(emp_project.description);
-$('#project_role').text(emp_project.role);
+
+if (emp_projects.length !== 0) {
+
+	let emp_project_list_html = '';
+
+    for (let i = 0; i < emp_projects.length; i++) {
+        let emp_project = emp_projects[i];
+
+    	emp_project_list_html += '<tr>'+
+				'<td>'+emp_project.name+'</td>'+
+				'<td>'+emp_project.role+'</td>'+
+				'<td>'+emp_project.description+'</td>'+
+				'<td>'+getDateFromMS(emp_project.created)+'</td>'+
+				'</tr>';
+
+        // $('#project_name').text(emp_project.name);
+        // $('#project_description').text(emp_project.description);
+        // $('#project_role').text(emp_project.role);
+
+    }
+
+    $('#tbody_project_list').append(emp_project_list_html);
+}
 
 
 var emp_skills = alasql('SELECT * FROM skill WHERE emp=?' ,[id]);
@@ -98,6 +127,28 @@ for (var i = 0; i < edus.length; i++) {
 	$('<a class="btn btn-xs btn-danger">').html('<span class="glyphicon glyphicon-remove"></span> Delete').appendTo(td);
 }
 $('#ins-edu').attr('href', 'edu-form.html?emp=' + id);
+
+//read payroll information
+
+var pays = alasql("SELECT * FROM payroll WHERE emp=?",[ id ]);
+var total_pay = 0;
+for(var i =0;i<pays.length;i++){
+	if(pays[i]["type"] === "plus")
+	{
+		total_pay += pays[i]["amount"];
+        $("#tbody-payroll").append('<tr class="text-success"><td>' + pays[i]["item"] + '</td><td>' +pays[i]["amount"] + '</td></tr>');
+	}
+	else
+	{
+		total_pay -= pays[i]["amount"];
+        $("#tbody-payroll").append('<tr class="text-danger"><td>' + pays[i]["item"] + '</td><td>' +pays[i]["amount"] + '</td></tr>');
+	}
+
+
+}
+
+$("#tbody-payroll").append('<tr bgcolor="#008b8b" ><td><b>Total : </b></td><td><b>' +total_pay.toFixed(2)+ '</b></td></tr>');
+
 
 // delete employee
 function destroy() {

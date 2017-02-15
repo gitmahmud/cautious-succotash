@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="lib/jquery.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+    <script src="lib/bootstrap.js"></script>
+    <script src="lib/alasql.js"></script>
+    <script src="lib/purl.js"></script>
+    <script src="js/db.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta name="viewport" content="width=device-width">
+    <title>COMPANY</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#navbar-collapse">
+                <span class="sr-only">Toggle navigation</span> <span
+                    class="icon-bar"></span> <span class="icon-bar"></span> <span
+                    class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand">COMPANY</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Personal Info
+                    Management</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown"><a href="#" class="dropdown-toggle"
+                                        data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span>
+                    Settings <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a onclick="window.location.reload(true);"><span
+                                class="glyphicon glyphicon-refresh"></span> Reload</a></li>
+                        <li><a onclick="DB.init();"><span
+                                class="glyphicon glyphicon-repeat"></span> Init DB</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a onclick="DB.remove();"><span
+                                class="glyphicon glyphicon-trash"></span> Delete DB</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href="index.html">Back to Employee List</a></li>
+    </ol>
+    <ol class="breadcrumb">
+        <li><h2 class="text-primary text-center">Change payroll items </h2></li>
+    </ol>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th class="col-sm-3">Payroll item</th>
+            <th class="col-sm-4">Reset payroll amount</th>
+            <th class="col-sm-5">Increase/decrease payroll amount</th>
+        </tr>
+        </thead>
+
+        <tbody id="tbody_change_payroll">
+        <!--<tr>-->
+        <!--<td class="col-sm-4"> Basic Salary</td>-->
+        <!--<td class="col-sm-3">-->
+        <!--<form class="form-inline">-->
+        <!--<div class="form-group">-->
+
+        <!--<input type="number" class="form-control col-sm-2" placeholder="Amount"-->
+        <!--id="id_payroll_reset_amount" min="0">-->
+
+        <!--</div>-->
+        <!--<div class="form-group">-->
+        <!--<button class="btn btn-primary" type="button" id="button_reset_amount">Reset</button>-->
+        <!--</div>-->
+        <!--</form>-->
+        <!--</td>-->
+        <!--<td class="col-sm-5">-->
+        <!--<form class="form-inline">-->
+        <!--<div class="form-group">-->
+        <!--<select class="form-control col-sm-2" id="id_select_amount_percentage">-->
+        <!--<option>By Amount</option>-->
+        <!--<option>By Percentage</option>-->
+        <!--</select>-->
+        <!--</div>-->
+        <!--<div class="form-group" id="div_change_amount">-->
+        <!--<input type="number" class="form-control col-sm-2" placeholder="Amount" style="width: 100%"-->
+        <!--id="id_payroll_increase_decrease_amount">-->
+        <!--</div>-->
+
+        <!--<div class="form-group" id="div_change_percentage" style="display: none">-->
+        <!--<input type="number" class="form-control col-sm-2" placeholder="%" style="width: 60%"-->
+        <!--id="id_payroll_increase_decrease_percentage" min="-100">-->
+        <!--<label style="padding-left: 5%">    %</label>-->
+
+        <!--</div>-->
+        <!--<div class="form-group">-->
+        <!--<button type="button" class="btn btn-primary" id="button_adjust_payroll">Adjust-->
+        <!--</button>-->
+        <!--</div>-->
+        <!--</form>-->
+        <!--</td>-->
+        <!--</tr>-->
+        </tbody>
+
+
+    </table>
+</div>
+
+
+<script src="js/change-payroll.js"></script>
+<script>
+
+    $(" .class_col_3 ").change(function () {
+
+        let arr = $(this).attr("class").split(" ");
+        let arr_row = arr[arr.length - 1];
+        console.log(arr_row);
+        //$(this).find("class")
+
+        if($(this).find(":selected").text() === "By Amount"){
+
+            $(" .class_div_amount ."+arr_row).parent().show();
+            $(" .class_div_percentage ."+arr_row).parent().hide();
+
+
+        }
+        else  {
+
+            $(" .class_div_percentage ."+arr_row).parent().show()
+
+            $(" .class_div_amount ."+arr_row).parent().hide();
+
+            //console.log($(" div .class_div_percentage ."+arr_row));
+
+        }
+
+
+    });
+
+    $(" .class_col_select_another_item_percentage ").change(function () {
+
+        let arr = $(this).attr("class").split(" ");
+        let arr_row = arr[arr.length - 1];
+
+        if($(this).find(":selected").text() === "By Amount"){
+
+            $(" .class_div_reset_by_amount ."+arr_row).parent().show();
+            $(" .class_div_another_item_percentage ."+arr_row).parent().hide();
+
+
+        }
+        else  {
+
+            $(" .class_div_another_item_percentage ."+arr_row).parent().show()
+
+            $(" .class_div_reset_by_amount ."+arr_row).parent().hide();
+
+            //console.log($(" div .class_div_percentage ."+arr_row));
+
+        }
+
+
+
+    });
+
+
+
+</script>
+</body>
+</html>
