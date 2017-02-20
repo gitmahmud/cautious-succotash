@@ -1,5 +1,5 @@
 
-
+//alert($("#sbox_3").find(":selected").val());
 
 // parse request params
 var q1 = $.url().param('q1');
@@ -7,16 +7,53 @@ $('input[name="q1"]').val(q1);
 var q2 = $.url().param('q2');
 $('input[name="q2"]').val(q2);
 
-var q3 = $.url().param('q3');
-$('input[name="q3"]').val(q3);
+var queryParameters = [];
+var searchParameters = [];
+queryParameters = $.url().param();
+
+for(var key in queryParameters){
+
+	if(queryParameters.hasOwnProperty(key)){
+
+		let queryId = parseInt(key.substring(1));
+		let selectBoxId = 'sbox_' + queryId ;
+		console.log('b Id '+selectBoxId);
+		let selectedSearch = $("#"+selectBoxId).find(":selected").val() ;
+		console.log('S ' +selectedSearch);
+
+		if(selectedSearch  === 'Skill')
+		{
+			searchParameters.push('knows '+ $.url().param('q'+queryId) ) ;
+		}
+		else if(selectedSearch === 'Age')
+		{
+            searchParameters.push('age '+ $.url().param('q'+queryId) ) ;
+
+		}
+		else if(selectedSearch === 'Experience')
+		{
+            searchParameters.push('has '+ $.url().param('q'+queryId) +' of experience ') ;
+
+		}
+		else if(selectedSearch === 'Joining Date')
+		{
+            searchParameters.push('Joined '+ $.url().param('q'+queryId) ) ;
+		}
+		else
+		{
+            searchParameters.push($.url().param('q'+queryId) ) ;
+
+		}
 
 
-var q4 = $.url().param('q4');
-$('input[name="q4"]').val(q4);
+
+    }
+}
+
+console.log("aa ",searchParameters);
 
 
-var q5 = $.url().param('q5');
-$('input[name="q5"]').val(q5);
+
 
 
 var emps , arr_task_emp;
@@ -243,105 +280,44 @@ window.location.reload(true);
 
 
 
-console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
+//console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
 var directSearchJson = JSON.parse(localStorage.getItem("directSearchJson"));
 
 
 
 
-if(q3 !== undefined) {
+if(searchParameters.length > 0 ) {
     emps = alasql('SELECT * FROM emp', []);
 
-	if(q3)
-	{
 
-		let tempEmps = parseSearchString(q3) ;
-		if(tempEmps === undefined)
-		{
-			tempEmps = [];
-		}
+    for(let i = 0;i<searchParameters.length ; i++) {
 
-		console.log(tempEmps);
+    	let query = searchParameters[i];
 
+            let tempEmps = parseSearchString(query);
+            if (tempEmps === undefined) {
+                tempEmps = [];
+            }
 
-		for(let i =0;i<emps.length ;i++)
-		{
-			let isFound = false;
-			for(let j =0;j<tempEmps.length ; j++)
-			{
-				if(emps[i]["id"] === tempEmps[j]["id"])
-				{
-					isFound = true;
-					break;
-				}
-			}
-			if(!isFound)
-			{
-				emps.splice(i,1);
-				i--;
-			}
-		}
-	}
-	if(q4)
-	{
-        let tempEmps = parseSearchString(q4) ;
-        if(tempEmps === undefined)
-        {
-            tempEmps = [];
-        }
-
-        console.log(tempEmps);
+            console.log(tempEmps);
 
 
-        for(let i =0;i<emps.length ;i++)
-        {
-            let isFound = false;
-            for(let j =0;j<tempEmps.length ; j++)
-            {
-                if(emps[i]["id"] === tempEmps[j]["id"])
-                {
-                    isFound = true;
-                    break;
+            for (let i = 0; i < emps.length; i++) {
+                let isFound = false;
+                for (let j = 0; j < tempEmps.length; j++) {
+                    if (emps[i]["id"] === tempEmps[j]["id"]) {
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (!isFound) {
+                    emps.splice(i, 1);
+                    i--;
                 }
             }
-            if(!isFound)
-            {
-                emps.splice(i,1);
-                i--;
-            }
-        }
 
+    }
 
-	}
-	if(q5)
-	{
-        let tempEmps = parseSearchString(q5) ;
-        if(tempEmps === undefined)
-        {
-            tempEmps = [];
-        }
-
-        console.log(tempEmps);
-
-
-        for(let i =0;i<emps.length ;i++)
-        {
-            let isFound = false;
-            for(let j =0;j<tempEmps.length ; j++)
-            {
-                if(emps[i]["id"] === tempEmps[j]["id"])
-                {
-                    isFound = true;
-                    break;
-                }
-            }
-            if(!isFound)
-            {
-                emps.splice(i,1);
-                i--;
-            }
-        }
-	}
 
 	let linkPayroll = "change-payroll.html?p=";
 
@@ -502,14 +478,60 @@ console.log(emps);
 // create employee list
 var tbody = $('#tbody-emps');
 for (var i = 0; i < emps.length; i++) {
+
+
 	var emp = emps[i];
-	var tr = $('<tr></tr>');
+    let temp = alasql("SELECT * from skill where emp="+emp.id);
+
+    let skills = "";
+    for(let ii = 0;ii<temp.length ; ii++)
+	{
+		skills += temp[ii]["name"] + "<br>";
+	}
+
+	temp = alasql("SELECT * from project where emp="+emp.id);
+    let projects = "";
+    for(let ii = 0;ii<temp.length ; ii++)
+    {
+        projects += temp[ii]["name"]+"<br>";
+    }
+
+    temp = alasql("SELECT * from professional where emp="+emp.id)[0];
+    let joining  = getDateFromMS(temp.joining);
+    let nationality = temp.nationality;
+    let city_name = alasql("SELECT *  from addr where emp ="+emp.id)[0]["city"];
+
+
+    temp = alasql("SELECT *  from edu where emp = "+emp.id);
+    let major_name  = temp.length === 0 ? '':temp[0]["major"];
+    let school_name = temp.length === 0 ? '' : temp[0]["school"];
+
+
+    temp = alasql("SELECT *  from payroll where emp ="+emp.id);
+
+    let payroll_names = "";
+    for(let ii = 0;ii<temp.length ; ii++)
+    {
+        payroll_names += temp[ii]["item"] +" : " +  temp[ii]["amount"]+"<br>"
+    }
+
+
+
+    var tr = $('<tr></tr>');
 	tr.append('<td><img height=40 class="img-circle" src="img/' + emp.id + '.jpg"></td>');
-	tr.append('<td><a href="emp.html?id=' + emp.id + '">' + emp.number + '</a></td>');
-	tr.append('<td>' + emp.name + '</td>');
-	tr.append('<td>' + DB.choice(emp.sex) + '</td>');
+	tr.append('<td><a href="emp.html?id=' + emp.id + '">' + emp.name + '</a></td>');
+	tr.append('<td>' + emp.dept + '</td>');
+	tr.append('<td>' + emp.desgn + '</td>');
+    tr.append('<td>' + joining + '</td>');
+	tr.append('<td>' + skills + '</td>');
+	tr.append('<td>' + projects + '</td>');
+    tr.append('<td>' + nationality + '</td>');
+    tr.append('<td>' + city_name + '</td>');
+    tr.append('<td>' + school_name + '</td>');
+    tr.append('<td>' + major_name + '</td>');
+    tr.append('<td>' + payroll_names + '</td>');
+
 	tr.append('<td>' + emp.birthday + '</td>');
-	tr.append('<td>' + emp.tel + '</td>');
 	tr.appendTo(tbody);
 }
 
@@ -861,6 +883,11 @@ function empSkillExpSortShow(arr_task_emp) {
 
 
 
+
+}
+function getDateFromMS(r) {
+    let t = new Date(r);
+    return t.getFullYear() + "/"+(t.getMonth()+1)+"/"+t.getDate();
 
 }
 
