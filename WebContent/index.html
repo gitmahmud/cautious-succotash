@@ -81,17 +81,17 @@
             <div>
 
                 <select class="form-control" id="sbox_3">
-                    <option>Designation</option>
-                    <option>Skill</option>
-                    <option>Department</option>
-                    <option>Age</option>
-                    <option>Experience</option>
-                    <option>Major</option>
-                    <option>School</option>
-                    <option>Lives in</option>
-                    <option>Joining Date</option>
-                    <option>Nationality</option>
-                    <option>Marital Status</option>
+                    <option value="Designation">Designation</option>
+                    <option value="Skill">Skill</option>
+                    <option value="Department">Department</option>
+                    <option value="Age">Age</option>
+                    <option value="Experience">Experience</option>
+                    <option value="Major">Major</option>
+                    <option value="School">School</option>
+                    <option value="Lives">Lives in</option>
+                    <option value="Joining">Joining Date</option>
+                    <option value="Nationality">Nationality</option>
+                    <option value="Martial">Marital Status</option>
                 </select>
 
 
@@ -108,7 +108,7 @@
 
         <div>
             <hr>
-            <button type="submit" class="btn btn-primary" id="free_search_button">
+            <button type="button" class="btn btn-primary" id="free_search_button">
                 <span class="glyphicon glyphicon-search"></span> Free Search
             </button>
         </div>
@@ -126,6 +126,7 @@
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
+            <th><input type="hidden" class=" class_payroll_checkbox class_payroll_id_all"></th>
             <th></th>
             <th>Name</th>
             <th>Department</th>
@@ -147,8 +148,13 @@
 
     <div class="clearfix" style="margin: 10px 0;" id="business_op">
 
-        <button type="button" class="btn btn-primary btn-lg " data-toggle="modal"
-                data-target="#addPayrollModal"><span class="glyphicon glyphicon-credit-card"></span>Add new
+        <button type="button" class="btn btn-primary btn-lg " id="id_adjust_payroll_button">
+            <span class="glyphicon glyphicon-credit-card"></span>Adjust payroll
+        </button>
+
+        <button type="button" class="btn btn-primary btn-lg " style="display: none" id="button_add_payroll_modal"
+                onclick="addPayrollModalStart()"
+        ><span class="glyphicon glyphicon-credit-card"></span>Add new
             payroll
         </button>
         <div id="addPayrollModal" class="modal fade" role="dialog">
@@ -161,6 +167,9 @@
                         <h4 class="modal-title text-primary">Add new payroll item</h4>
                     </div>
                     <div class="modal-body">
+                        <h3><span class="label label-primary"> Selected Employees</span></h3>
+                        <div id="employee_name_show_add_pay_roll" style="max-height: 200px ; overflow-y: auto"></div>
+                        <hr>
 
                         <form>
                             <div class="form-group">
@@ -207,10 +216,43 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal" id="add_payroll_submit">Add
+                        <button type="button" class="btn btn-success" id="add_payroll_submit">Add
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="showAddPayrollModalReport" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Payroll changes </h4>
+                    </div>
+                    <div class="modal-body" style="max-height: 600px ; overflow-y: auto">
+                        <table class="table table-bordered">
+                            <thead>
+                            <th></th>
+                            <th>Employee name</th>
+                            <th>Payroll</th>
+                            </thead>
+                            <tbody id="tbody_emps_add_payroll_report">
+
+
+                            </tbody>
+
+
+                        </table>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="modal_close_add_payroll">Close</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -220,6 +262,7 @@
         <!--</a>-->
 
         <button type="button" class="btn btn-success btn-lg  " style="margin-left: 25%" data-toggle="modal"
+                id="id_assign_task_button"
                 data-target="#modalAssignTask">
             <span class="glyphicon glyphicon-tasks">Assign Task</span>
         </button>
@@ -325,10 +368,10 @@
         </div>
 
 
-        <a href="change-payroll.html" class="btn btn-lg btn-warning pull-right"
+        <button class="btn btn-lg btn-warning pull-right" style="display: none"
            id="button_change_payroll">
             <span class="glyphicon glyphicon-pencil"> Change Payroll </span>
-        </a>
+        </button>
     </div>
 
 </div>
@@ -355,7 +398,7 @@
         let nextId = 'q' + (parseInt($("#free_search_group").children(':last-child').children(':last-child').attr("name").substring(1)) + 1);
 
 
-        $('#free_search_group').append('<div><select class="form-control" id="sbox_'+nextId.substring(1)+'">' +
+        $('#free_search_group').append('<div><select class="form-control" id="sbox_' + nextId.substring(1) + '">' +
             ' <option>Designation</option>' +
             '      <option>Skill</option>        <option>Department</option>        <option>Age</option>    ' +
             '    <option>Experience</option>        <option>Major</option>        <option>School</option>     ' +
@@ -385,8 +428,6 @@
 
 
     });
-
-
 
 
     $(' .class_task_checkbox ').change(function () {
@@ -423,6 +464,27 @@
         }
         console.log(arr_task_emp);
 
+
+    });
+
+    $('#id_adjust_payroll_button').on('click', function () {
+        $('.class_payroll_checkbox').attr('type', 'checkbox');
+        $('#id_adjust_payroll_button').hide();
+        $('#id_assign_task_button').hide();
+        $('#button_add_payroll_modal').show();
+        $('#button_change_payroll').show();
+        $('.background_payroll_index_page').css('background-color', 'yellow');
+
+    })
+
+    $('.class_payroll_id_all').change(function () {
+        if ($(this).prop('checked')) {
+            $('.class_payroll_checkbox').prop('checked', true);
+
+        }
+        else {
+            $('.class_payroll_checkbox').prop('checked', false);
+        }
 
     });
 
