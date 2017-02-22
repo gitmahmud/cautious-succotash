@@ -9,10 +9,16 @@ $('input[name="q2"]').val(q2);
 var queryParameters = [];
 var searchParameters = [];
 queryParameters = $.url().param();
+var searchLabel = '<b>You have searched for employees ';
 
 for (var key in queryParameters) {
 
     if (queryParameters.hasOwnProperty(key)) {
+
+        if ($.url().param(key) === '') {
+            continue;
+        }
+
 
         // let queryId = parseInt(key.substring(1));
         // let selectBoxId = 'sbox_' + queryId;
@@ -23,25 +29,88 @@ for (var key in queryParameters) {
 
         if (key.includes('Skill')) {
             searchParameters.push('knows ' + $.url().param(key));
+            searchLabel += 'who knows ' + $.url().param(key);
+
+            $('.background_skill_index_page').css('background-color', 'yellow');
         }
         else if (key.includes('Age')) {
             searchParameters.push('age ' + $.url().param(key));
+
+            searchLabel += 'whose age is ' + $.url().param(key)
+            $('.background_birthday_index_page').css('background-color', 'yellow');
+
 
         }
         else if (key.includes('Experience')) {
             searchParameters.push('has ' + $.url().param(key) + ' of experience ');
 
+            searchLabel += 'who has ' + $.url().param(key) + ' of experience '
+            $('.background_joining_index_page').css('background-color', 'yellow');
+
+
         }
         else if (key.includes('Joining')) {
             searchParameters.push('Joined ' + $.url().param(key));
+            searchLabel += 'who have joined ' + $.url().param(key);
+            $('.background_joining_index_page').css('background-color', 'yellow');
+
         }
         else {
             searchParameters.push($.url().param(key));
+            if (key.includes('Designation')) {
+                searchLabel += 'whose designation is ' + $.url().param(key);
+                $('.background_designation_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Department')) {
+                searchLabel += 'who is in ' + $.url().param(key) + ' department';
+                $('.background_department_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Major')) {
+                searchLabel += 'who have majored in ' + $.url().param(key);
+                $('.background_major_index_page').css('background-color', 'yellow');
+
+            }
+            else if (key.includes('School')) {
+                searchLabel += 'who have studied in ' + $.url().param(key);
+                $('.background_school_index_page').css('background-color', 'yellow');
+
+
+            }
+            else if (key.includes('Lives')) {
+                searchLabel += 'who lives in ' + $.url().param(key);
+                $('.background_city_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Nationality')) {
+
+                searchLabel += 'who have ' + $.url().param(key) + ' nationality ';
+                $('.background_nationality_index_page').css('background-color', 'yellow');
+
+
+            }
+            else if (key.includes('married')) {
+
+                searchLabel += 'who is ' + $.url().param(key);
+
+            }
+            else if (key.includes('Project')) {
+                searchLabel += 'who works in ' + $.url().param(key);
+                $('.background_project_index_page').css('background-color', 'yellow');
+
+            }
+            else {
+                ;
+            }
+
 
         }
 
+        searchLabel += ' and ';
 
     }
+}
+
+if (searchLabel.endsWith('and ')) {
+    $('#search_result_label').html(searchLabel.substring(0, searchLabel.length - 4) + '.</b>');
 }
 
 console.log("aa ", searchParameters);
@@ -50,23 +119,21 @@ console.log("aa ", searchParameters);
 var emps, arr_task_emp;
 
 
-
-$('#free_search_button').on('click' , function () {
+$('#free_search_button').on('click', function () {
     let indexSearchLink = 'index.html?';
     let childSize = $('#free_search_group').children().length;
     $('#free_search_group').children().each(function (index) {
         let selectionBox = $(this).children().eq(0).val();
         let inputBox = $(this).children().eq(1).val();
-        indexSearchLink += selectionBox+'='+inputBox;
+        indexSearchLink += selectionBox + '=' + inputBox;
         //console.log(selectionBox);
-        if(index < childSize -1)
-        {
+        if (index < childSize - 1) {
             indexSearchLink += '&';
         }
 
     });
 
-    alert(indexSearchLink);
+    // alert(indexSearchLink);
     window.location.replace(indexSearchLink);
 
 })
@@ -115,6 +182,29 @@ function addPayrollModalStart() {
 
 }
 
+function bonusDistributionModalStart() {
+    removeUncheckItemsFromEmp();
+    let str = '';
+    for (let i = 0; i < emps.length; i++) {
+
+        str += '<tr><td><img height=40 class="img-circle" src="img/' + emps[i].id + '.jpg"></td>';
+        str += '<td>' + emps[i]["name"] + '</td>';
+        str += '<td>' + emps[i]["desgn"] + '</td>';
+        str += '<td><input style="width: 50px;" class="input-sm class_bonus_percentage class_bonus_employee_' + emps[i]["id"] + '" type="text" value="0"></td>';
+        str += '<td><input class="class_bonus_amount  class_bonus_employee_' + emps[i]["id"] + '" type="number"></td>';
+        str += '</tr>';
+
+    }
+
+    //console.log(str , emps);
+
+    $('#tbody_bonus_distribution').html(str);
+
+    $('#modalBonusDistribution').modal('show');
+
+
+}
+
 
 function checkAddPayrollValidation() {
     let pay_amount = parseInt($("#id_model_pay_amount").val());
@@ -136,11 +226,10 @@ function checkAddPayrollValidation() {
 
             }
             else if (arr.length === 1) {
-                if(arr[0]["type"] === 'plus') {
+                if (arr[0]["type"] === 'plus') {
                     maximumDeductable = arr[0]["amount"];
                 }
-                else
-                {
+                else {
                     maximumDeductable = 0;
                 }
 
@@ -256,14 +345,14 @@ $("#add_payroll_submit").on('click',
         //alert(pay_name+"\n"+pay_amount+"\n"+pay_type+"\n"+pay_id);
         console.log('new ' + newPayIds);
 
-        generateReportAddPayroll(newPayIds);
+        generateReportPayroll(newPayIds, 'new');
 
 
     }
 );
 
 
-function generateReportAddPayroll(newIds) {
+function generateReportPayroll(newIds, pay_label) {
     let str = '';
 
     for (let i = 0; i < emps.length; i++) {
@@ -282,7 +371,7 @@ function generateReportAddPayroll(newIds) {
                     str += pays[i]["item"] + ' :   ' + pays[i]["amount"] + ' <br>';
                 }
                 else {
-                    str += pays[i]["item"] + ' :  ' + pays[i]["amount"] + '<span class="label label-warning">New</span> <br>';
+                    str += pays[i]["item"] + ' :  ' + pays[i]["amount"] + '<span class="label label-warning">' + pay_label+ '</span> <br>';
 
                 }
             }
@@ -293,7 +382,7 @@ function generateReportAddPayroll(newIds) {
                     str += pays[i]["item"] + ' :  -' + pays[i]["amount"] + ' <br>';
                 }
                 else {
-                    str += pays[i]["item"] + ' :  -' + pays[i]["amount"] + '<span class="label label-warning">New</span> <br>';
+                    str += pays[i]["item"] + ' :  -' + pays[i]["amount"] + '<span class="label label-warning">' + pay_label+ '</span> <br>';
 
                 }
             }
@@ -303,6 +392,15 @@ function generateReportAddPayroll(newIds) {
 
 
     $('#tbody_emps_add_payroll_report').html(str);
+    if(pay_label === 'new'){
+
+        $('#reportPayTitle').text('Add Payroll changes');
+    }
+    else
+    {
+        $('#reportPayTitle').text('Bonus inclusion changes . ');
+    }
+
     $('#showAddPayrollModalReport').modal('show');
 
 
@@ -318,7 +416,7 @@ $('#modal_close_add_payroll').on('click', function () {
 });
 
 
-$('#button_change_payroll').on('click',function () {
+$('#button_change_payroll').on('click', function () {
     removeUncheckItemsFromEmp();
 
     let linkPayroll = "change-payroll.html?p=";
@@ -505,9 +603,6 @@ if (searchParameters.length > 0) {
     }
 
 
-
-
-
     let arr_pay_items = [];
     let first_items = alasql("SELECT * from payroll where emp = " + emps[0]["id"]);
     for (let i = 0; i < first_items.length; i++) {
@@ -674,21 +769,84 @@ for (var i = 0; i < emps.length; i++) {
     tr.append('<td><input type="hidden" class=" class_payroll_checkbox class_payroll_id_' + emp.id + '"></td>');
     tr.append('<td><img height=40 class="img-circle" src="img/' + emp.id + '.jpg"></td>');
     tr.append('<td><a href="emp.html?id=' + emp.id + '">' + emp.name + '</a></td>');
-    tr.append('<td>' + emp.dept + '</td>');
-    tr.append('<td>' + emp.desgn + '</td>');
-    tr.append('<td>' + joining + '</td>');
-    tr.append('<td>' + skills + '</td>');
-    tr.append('<td>' + projects + '</td>');
-    tr.append('<td>' + nationality + '</td>');
-    tr.append('<td>' + city_name + '</td>');
-    tr.append('<td>' + school_name + '</td>');
-    tr.append('<td>' + major_name + '</td>');
+    tr.append('<td class="background_department_index_page">' + emp.dept + '</td>');
+    tr.append('<td class="background_designation_index_page">' + emp.desgn + '</td>');
+    tr.append('<td class="background_joining_index_page">' + joining + '</td>');
+    tr.append('<td class="background_skill_index_page">' + skills + '</td>');
+    tr.append('<td class="background_project_index_page">' + projects + '</td>');
+    tr.append('<td class="background_nationality_index_page">' + nationality + '</td>');
+    tr.append('<td class="background_city_index_page">' + city_name + '</td>');
+    tr.append('<td class="background_school_index_page">' + school_name + '</td>');
+    tr.append('<td class="background_major_index_page" >' + major_name + '</td>');
     tr.append('<td class="background_payroll_index_page">' + payroll_names + '</td>');
-
-    tr.append('<td>' + emp.birthday + '</td>');
+    tr.append('<td class="background_birthday_index_page">' + emp.birthday + '</td>');
     tr.appendTo(tbody);
 }
 
+markSearchFields();
+
+function markSearchFields() {
+    for (var key in queryParameters) {
+
+        if (queryParameters.hasOwnProperty(key)) {
+
+            if ($.url().param(key) === '') {
+                continue;
+            }
+
+
+            if (key.includes('Skill')) {
+
+                $('.background_skill_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Age')) {
+
+                $('.background_birthday_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Experience')) {
+
+                $('.background_joining_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Joining')) {
+                $('.background_joining_index_page').css('background-color', 'yellow');
+
+            }
+            else if (key.includes('Designation')) {
+                $('.background_designation_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Department')) {
+                $('.background_department_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Major')) {
+                $('.background_major_index_page').css('background-color', 'yellow');
+
+            }
+            else if (key.includes('School')) {
+                $('.background_school_index_page').css('background-color', 'yellow');
+
+            }
+            else if (key.includes('Lives')) {
+
+                $('.background_city_index_page').css('background-color', 'yellow');
+            }
+            else if (key.includes('Nationality')) {
+                $('.background_nationality_index_page').css('background-color', 'yellow');
+            }
+
+            else if (key.includes('Project')) {
+                $('.background_project_index_page').css('background-color', 'yellow');
+            }
+            else {
+                ;
+            }
+
+
+        }
+
+
+    }
+
+}
 function parseSearchString(str) {
     console.log("str " + str);
 
@@ -1004,4 +1162,224 @@ function getDateFromMS(r) {
 }
 
 
+function bonusDistributionOptionChange() {
+
+
+    let totalBonusAmount = parseInt($('#id_bonus_total_amount_input').val());
+    console.log(totalBonusAmount);
+
+    $('#bonus_remaining_notification').text('');
+
+    setDefaultBonusValues();
+
+
+    console.log($(this));
+
+
+    if ($('#id_bonus_distribution_select').find(":selected").text() === 'Distribute evenly') {
+
+
+        console.log('hhh');
+        $('.class_bonus_percentage').hide();
+        $('.class_bonus_title_percentage').text('');
+
+        let individualAmount = parseFloat(totalBonusAmount / emps.length).toFixed(2);
+        console.log(individualAmount);
+        for (let i = 0; i < emps.length; i++) {
+            let empId = emps[i]["id"];
+
+            $('.class_bonus_amount.class_bonus_employee_' + empId).val(individualAmount);
+
+        }
+        $('.class_bonus_amount').unbind('keyup');
+        $('.class_bonus_amount').keyup(checkTotalAmountSum);
+
+    }
+    else if ($('#id_bonus_distribution_select').find(":selected").text() === 'Distribute by ratio') {
+        $('#bonus_remaining_notification').text('');
+
+        $('.class_bonus_percentage').show();
+        $('.class_bonus_title_percentage').text('Ratio');
+
+        $('.class_bonus_percentage').keyup(function (event) {
+
+            if (event.which == 13) {
+                event.preventDefault();
+            }
+
+
+            let totalRatio = 0;
+            let totalBonusAmount = parseInt($('#id_bonus_total_amount_input').val());
+
+
+            for (let i = 0; i < emps.length; i++) {
+                let empId = emps[i]["id"];
+                totalRatio += parseFloat($('.class_bonus_percentage.class_bonus_employee_' + empId).val());
+
+            }
+            for (let i = 0; i < emps.length; i++) {
+                let empId = emps[i]["id"];
+                let individualAmount = ((parseInt($('.class_bonus_percentage.class_bonus_employee_' + empId).val()) * totalBonusAmount) / totalRatio).toFixed(2);
+
+                $('.class_bonus_amount.class_bonus_employee_' + empId).val(individualAmount);
+
+            }
+
+
+        });
+
+    }
+    else if ($('#id_bonus_distribution_select').find(":selected").text() === 'Distribute by percentage') {
+        $('#bonus_remaining_notification').text('');
+        $('.class_bonus_percentage').show();
+        $('.class_bonus_title_percentage').text('Percentage');
+        $('.class_bonus_percentage').keyup(function (event) {
+
+            if (event.which == 13) {
+                event.preventDefault();
+            }
+
+
+            if (parseFloat($(this).val()) > 100) {
+                alert("Percentage must be less than or equal to 100 . ");
+                return;
+
+            }
+
+            let totalPercentageSummation = 0;
+
+
+            for (let i = 0; i < emps.length; i++) {
+                let empId = emps[i]["id"];
+                totalPercentageSummation += parseInt($('.class_bonus_percentage.class_bonus_employee_' + empId).val());
+
+            }
+            if (totalPercentageSummation > 100) {
+                let arr = $(this).attr('class').split(' ');
+                let arr2 = arr[arr.length - 1].split('_');
+                let targetId = parseInt(arr2[arr2.length - 1]);
+
+                for (let i = 0; i < emps.length; i++) {
+                    if (emps[i].id !== targetId) {
+                        $('.class_bonus_percentage.class_bonus_employee_' + emps[i]["id"]).val(0);
+
+                    }
+
+                }
+
+            }
+
+            for (let i = 0; i < emps.length; i++) {
+                let empId = emps[i]["id"];
+                let individualAmount = ((parseFloat($('.class_bonus_percentage.class_bonus_employee_' + empId).val()) * totalBonusAmount) / 100).toFixed(2);
+
+                $('.class_bonus_amount.class_bonus_employee_' + empId).val(individualAmount);
+
+            }
+
+            setRemainingBudgetLabel();
+
+        });
+    }
+    else if ($('#id_bonus_distribution_select').find(":selected").text() === 'Distribute manually') {
+
+        $('.class_bonus_percentage').hide();
+        $('.class_bonus_title_percentage').text('');
+
+
+        $('.class_bonus_amount').unbind('keyup');
+        $('.class_bonus_amount').keyup(checkTotalAmountSum);
+
+
+    }
+    else {
+        console.log('else');
+        ;
+    }
+
+
+}
+$('#id_bonus_distribution_select').change(bonusDistributionOptionChange);
+
+$('#bonus_distribution_submission').on('click', function () {
+
+    if ($('#id_bonus_name_input').val() === '') {
+        alert("Enter valid bonus name . ");
+        return;
+    }
+
+    if (!setRemainingBudgetLabel()) {
+        alert("Please fix employee bonus amount or total budget amount");
+        return;
+    }
+
+
+    $('#modalBonusDistribution').hide();
+
+    let pay_name = $('#id_bonus_name_input').val();
+
+    let newPayIds = [];
+
+    for (let i = 0; i < emps.length; i++) {
+
+
+        let pay_id = alasql("SELECT MAX(id) AS max_id from payroll")[0]["max_id"] + 1;
+        let pay_amount = $('.class_bonus_amount.class_bonus_employee_' + emps[i]["id"]).val();
+        alasql("INSERT INTO payroll VALUES(?,?,?,?,?);", [pay_id, emps[i]["id"], pay_name, pay_amount, 'plus']);
+        newPayIds.push(pay_id);
+
+    }
+
+    generateReportPayroll(newPayIds, 'bonus');
+
+
+});
+$('#id_bonus_total_amount_input').keyup(bonusDistributionOptionChange);
+function checkTotalAmountSum(event) {
+    if (event.which == 13) {
+        event.preventDefault();
+    }
+    setRemainingBudgetLabel();
+
+
+}
+
+function setRemainingBudgetLabel() {
+    let totalBonusAmount = parseInt($('#id_bonus_total_amount_input').val());
+    let totalSum = 0;
+
+    for (let i = 0; i < emps.length; i++) {
+        totalSum += parseFloat($('.class_bonus_amount.class_bonus_employee_' + emps[i]["id"]).val());
+
+
+    }
+
+    let remaining = parseFloat((totalBonusAmount - totalSum).toFixed(2));
+    console.log(remaining);
+
+    if (remaining < -0.001) {
+        alert("Total employee bonus exceeds bonus budget . ");
+        $('#bonus_remaining_notification').html('<span style="color: red" > Remaining budget is ' + remaining + '</span>');
+        return false;
+
+    }
+    else {
+
+        $('#bonus_remaining_notification').html('<span style="color: green"> Remaining budget is ' + remaining + '</span>');
+        return true;
+    }
+
+
+}
+
+function setDefaultBonusValues() {
+
+    for (let i = 0; i < emps.length; i++) {
+        $('.class_bonus_amount.class_bonus_employee_' + emps[i]["id"]).val(0);
+        $('.class_bonus_percentage.class_bonus_employee_' + emps[i]["id"]).val(0);
+
+
+    }
+
+}
 

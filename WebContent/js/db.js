@@ -111,7 +111,7 @@ DB.load = function() {
         function(roles_projects) {
             for (var i = 0; i < roles_projects.length; i++) {
                 // console.log(payrolls[i]);
-                alasql('INSERT INTO role_project VALUES(?,?,?);', roles_projects[i]);
+                alasql('INSERT INTO role_project VALUES(?,?,?,?);', roles_projects[i]);
             }
         });
 

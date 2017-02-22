@@ -57,22 +57,24 @@
 </nav>
 
 <div class="container">
-    <form action="index.html" class="form-inline text-center">
-        <div class="form-group">
-            <input name="q1" type="text" class="form-control"
-                   placeholder="employee number">
-        </div>
-        <div class="form-group">
-            <input name="q2" type="text" class="form-control"
-                   placeholder="part of name">
-        </div>
-        <button type="submit" class="btn btn-primary">
-            <span class="glyphicon glyphicon-search"></span> Search
-        </button>
-    </form>
+    <!--<form action="index.html" class="form-inline text-center">-->
+        <!--<div class="form-group">-->
+            <!--<input name="q1" type="text" class="form-control"-->
+                   <!--placeholder="employee number">-->
+        <!--</div>-->
+        <!--<div class="form-group">-->
+            <!--<input name="q2" type="text" class="form-control"-->
+                   <!--placeholder="part of name">-->
+        <!--</div>-->
+        <!--<button type="submit" class="btn btn-primary">-->
+            <!--<span class="glyphicon glyphicon-search"></span> Search-->
+        <!--</button>-->
+    <!--</form>-->
     <hr>
-    <p class="bg-warning">You can search for age , skill ,designation , department , martial status , project name,
-        nationality etc...
+    <p class="bg-warning">You can search for age ,experience , skill ,designation , department , martial status ,
+        project name,
+        nationality, school , major etc.<br>Example : age => 50 years older , experience => 5 years , department =>
+        Sales , joining => this month etc...<br>
         Please click <span class="glyphicon glyphicon-plus"></span> more additional search criteria.</p>
     <form action="index.html" class="form-inline text-center">
 
@@ -81,8 +83,9 @@
             <div>
 
                 <select class="form-control" id="sbox_3">
-                    <option value="Designation">Designation</option>
                     <option value="Skill">Skill</option>
+                    <option value="Designation">Designation</option>
+                    <option value="Project">Project</option>
                     <option value="Department">Department</option>
                     <option value="Age">Age</option>
                     <option value="Experience">Experience</option>
@@ -113,13 +116,19 @@
             </button>
         </div>
     </form>
+
+    <br>
+    <hr>
+    <div style="background: yellow " id="search_result_label"></div>
+
+
     <hr>
 
 
     <div class="clearfix" style="margin: 10px 0;" id="new_emp">
 
-        <a href="emp-form.html" class="btn btn-sm btn-success pull-right"><span
-                class="glyphicon glyphicon-plus"></span> New</a>
+        <!--<a href="emp-form.html" class="btn btn-sm btn-success pull-right"><span-->
+                <!--class="glyphicon glyphicon-plus"></span> New</a>-->
 
     </div>
 
@@ -230,7 +239,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add Payroll changes </h4>
+                        <h4 class="modal-title" id="reportPayTitle">Add Payroll changes </h4>
                     </div>
                     <div class="modal-body" style="max-height: 600px ; overflow-y: auto">
                         <table class="table table-bordered">
@@ -250,6 +259,69 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" id="modal_close_add_payroll">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-success btn-lg  " style=" display : none ; margin-left: 25%"
+                id="button_bonus_distribution" onclick="bonusDistributionModalStart()">
+            <span class="glyphicon glyphicon-tasks">Bonus Distribution</span>
+        </button>
+
+        <div id="modalBonusDistribution" class="modal fade" role="dialog" style="min-width: 75%">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Bonus Distribution among employees .</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+
+                                <label for="id_bonus_name_input">Bonus name : </label>
+                                <input type="text" class="form-control" placeholder="Bonus" id="id_bonus_name_input">
+                            </div>
+                            <div class="form-group">
+
+                                <label for="id_bonus_total_amount_input">Total bonus amount </label>
+                                <input type="number" class="form-control" placeholder="Bonus" id="id_bonus_total_amount_input">
+                            </div>
+
+                            <div class="form-group form-inline">
+                                <label for="id_bonus_distribution_select">Distribution type :</label>
+                                <select class="form-control" id="id_bonus_distribution_select">
+
+                                    <option>(Select an option)</option>
+                                    <option>Distribute evenly</option>
+                                    <option>Distribute by ratio</option>
+                                    <option>Distribute by percentage</option>
+                                    <option>Distribute manually</option>
+                                </select>
+                            </div>
+                            <table class="table table-bordered col-sm-7">
+                                <thead>
+                                <th class="col-sm-1"></th>
+                                <th class="col-sm-2">Employee name</th>
+                                <th class="col-sm-1">Designation</th>
+                                <th class="col-sm-1 class_bonus_title_percentage">Percentage</th>
+                                <th class="col-sm-2">Amount</th>
+                                </thead>
+                                <tbody id="tbody_bonus_distribution">
+
+                                </tbody>
+
+                            </table>
+                            <h3 id="bonus_remaining_notification"></h3>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-primary" id="bonus_distribution_submission" >Proceed</button>
                     </div>
                 </div>
 
@@ -369,7 +441,7 @@
 
 
         <button class="btn btn-lg btn-warning pull-right" style="display: none"
-           id="button_change_payroll">
+                id="button_change_payroll">
             <span class="glyphicon glyphicon-pencil"> Change Payroll </span>
         </button>
     </div>
@@ -408,6 +480,10 @@
 
 
     });
+
+    //$('*[id*="sbox"]').
+
+
 
 
     $('#id_modal_select_option').change(function () {
@@ -473,9 +549,10 @@
         $('#id_assign_task_button').hide();
         $('#button_add_payroll_modal').show();
         $('#button_change_payroll').show();
+        $('#button_bonus_distribution').show();
         $('.background_payroll_index_page').css('background-color', 'yellow');
 
-    })
+    });
 
     $('.class_payroll_id_all').change(function () {
         if ($(this).prop('checked')) {
