@@ -61,6 +61,8 @@ for (let i = 0; i < payData.length; i++) {
 
 }
 
+
+
 for (let i = 0; i < payData.length; i++) {
     console.log(i);
     // let selectBoxId = "id_select_amount_percentage_"+i;
@@ -69,7 +71,60 @@ for (let i = 0; i < payData.length; i++) {
     let row_name = "class_row_" + i;
     let button_reset_class = payData[i]["universal_amount"] ? "btn-primary" : "btn-warning";
     let button_tooltip_reset = payData[i]["universal_amount"] ? '' : ' data-toggle="tooltip" data-placement="top" title="Employees have different amount for this item."' ;
-    let taxCss = payData[i]["item"].includes('Tax') ? ' data-toggle="tooltip" data-placement="top" title="This item automatically system generated . " style="background: indianred" ' : '';
+    let taxCss = payData[i]["item"].includes('Tax') ? ' data-toggle="tooltip" data-placement="top" title="This item automatically system generated . Change with caution. " style="background: darkgrey" ' : '';
+    let minusItemResetLabel = '';
+    let minusItemIncreaseLabel = '';
+    let minusItemResetMaxAttr = '';
+    let minusItemIncreaseMaxAttr = '';
+
+
+
+
+
+    let payType = alasql('SELECT type from payroll where item = "'+payData[i]["item"]+'"')[0]["type"];
+
+
+
+    if(payType === 'minus')
+    {
+        let minimumSalaryWithoutTax = 99999999 ;
+        let minimumSalary = 99999999;
+
+        for(let j = 0 ;j<ids.length ; j++)
+        {
+            let salaryWithoutTaxArr =  alasql('SELECT type , sum(amount) AS total from payroll where emp= ? and item != "'+payData[i]["item"]+'"  group by type', [ ids[j] ]);
+
+            if(salaryWithoutTaxArr.length === 1)
+            {
+                minimumSalaryWithoutTax = Math.min(minimumSalaryWithoutTax , salaryWithoutTaxArr[0]["total"]);
+            }
+            else
+            {
+                minimumSalaryWithoutTax = Math.min(minimumSalaryWithoutTax , Math.abs(salaryWithoutTaxArr[0]["total"] - salaryWithoutTaxArr[1]["total"]));
+
+            }
+            let salaryArr = alasql('SELECT type , sum(amount) AS total from payroll where emp= ?   group by type', [ ids[j] ]);
+
+            minimumSalary = Math.min(minimumSalary , salaryArr[0]["total"] - salaryArr[1]["total"] );
+
+        }
+       minusItemResetLabel = '<p class="label label-warning" style="color: black">Maximum reset amount : '+minimumSalaryWithoutTax+' </p>';
+       minusItemIncreaseLabel = '<p class="label label-warning" style="color: black">Maximum increase amount : '+minimumSalary+' </p>';
+
+       minusItemResetMaxAttr = ' max="'+minimumSalaryWithoutTax+'" ';
+       minusItemIncreaseMaxAttr = ' max="'+minimumSalary+'" ';
+
+
+        console.log(minimumSalaryWithoutTax + ' '+minimumSalary);
+
+
+    }
+
+
+
+
+
+
 
 
     $('#tbody_change_payroll').append(
@@ -79,7 +134,7 @@ for (let i = 0; i < payData.length; i++) {
         '<option>By Amount</option><option>By Percentage of another item</option></select></div>' +
 
         '<div class="form-group class_div_reset_by_amount">' +
-        '<input type="number" class="form-control col-sm-3 class_col_1 ' + row_name + '" placeholder="Amount"  min="0"><br/><i class="label label-default">Minimum reset amount : 0 </i><br/></div>' +
+        '<input type="number" class="form-control col-sm-3 class_col_1 ' + row_name + '" placeholder="Amount" '+minusItemResetMaxAttr+' min="0"><br/><p class="label label-warning" style="color: black">Minimum reset amount : 0 </p><br>'+minusItemResetLabel+'</div>' +
 
         '<div class="form-group class_div_another_item_percentage ' + row_name + '" style="display: none;" >' +
         '<input type="number" min="0" class="form-control col-sm-1 class_col_another_item_percentage ' + row_name + '" placeholder="%"  value="0">' +
@@ -94,9 +149,9 @@ for (let i = 0; i < payData.length; i++) {
 
 
         '<td class="col-sm-5"><form class="form-inline"><div class="form-group"><select class="form-control col-sm-2 class_col_3 ' + row_name + '" >' +
-        '<option>By Amount</option><option>By Percentage</option></select></div>' +
-        '<div class="form-group class_div_amount ' + row_name + '" ><input type="number" min="'+payData[i]["min_amount"]+'" class="form-control col-sm-2 class_col_4 ' + row_name + '" placeholder="Amount" style="width: 100%" value="0">' +
-        '<h3 class="label label-default">Maximum decrease amount : '+payData[i]["min_amount"]+' </h3><br></div>'+
+        '<option>By Amount</option><option>By Percentage</option></select></div><br>' +
+        '<div class="form-group class_div_amount ' + row_name + '" ><input type="number"'+minusItemIncreaseMaxAttr+' min="'+payData[i]["min_amount"]*(-1)+'" class="form-control col-sm-2 class_col_4 ' + row_name + '" placeholder="Amount" style="width: 75%" value="0"><br>' +
+        '<p class="label label-warning" style="color: black">Maximum decrease amount : '+payData[i]["min_amount"]+' </p><br>'+minusItemIncreaseLabel+'</div>'+
         '<div class="form-group class_div_percentage ' + row_name + '" style="display: none;" >' +
         '<input type="number" class="form-control col-sm-2 class_col_5 ' + row_name + '" placeholder="%" style="width: 60%" min="-100" value="0">' +
         '<label style="padding-left: 5%">    %</label> </div>' +
@@ -233,7 +288,7 @@ $(" .class_col_6 ").on('click', function () {
 
             }
 
-            console.log(pay_item_name + " " + pay_change_percent);
+
 
             if (pay_change_percent < 0) {
                 if(pay_change_percent < -0.5 ){
@@ -245,15 +300,24 @@ $(" .class_col_6 ").on('click', function () {
                 }
                 for (let i = 0; i < ids.length; i++) {
 
+                    let currentAmount = alasql('SELECT amount from payroll where emp = ? and item = ? ',[ids[i] , pay_item_name])[0]["amount"];
+                    let payTotalAmount = parseFloat( currentAmount * (1 - Math.abs( pay_change_percent ) )  )  ;
+                    payTotalAmount = parseFloat(payTotalAmount.toFixed(2));
+                    console.log(payTotalAmount);
 
-                    alasql("UPDATE payroll SET amount = amount * ? WHERE emp = ? and item = ?", [1 - Math.abs(pay_change_percent), ids[i], pay_item_name]);
+                    alasql("UPDATE payroll SET amount = ? WHERE emp = ? and item = ?", [payTotalAmount, ids[i], pay_item_name]);
 
                 }
 
             }
             else {
+
                 for (let i = 0; i < ids.length; i++) {
-                    alasql("UPDATE payroll SET amount = amount + amount * ? WHERE emp = ? and item = ?", [pay_change_percent, ids[i], pay_item_name]);
+                    let currentAmount = alasql('SELECT amount from payroll where emp = ? and item = ? ',[ids[i] , pay_item_name])[0]["amount"] ;
+                    let payTotalAmount =  parseFloat( (currentAmount * pay_change_percent) + currentAmount );
+                    payTotalAmount = parseFloat(payTotalAmount.toFixed(2));
+                    console.log(payTotalAmount);
+                    alasql("UPDATE payroll SET amount =  ? WHERE emp = ? and item = ?", [payTotalAmount, ids[i], pay_item_name]);
 
                 }
 
@@ -316,7 +380,7 @@ function generateReportChangePayroll(changeName)
                 }
             }
         }
-        str += '<b>Total : ' + total_pay + '</b></td></tr>';
+        str += '<b>Total : ' + total_pay.toFixed(2) + '</b></td></tr>';
     }
 
 
@@ -330,22 +394,93 @@ function generateReportChangePayroll(changeName)
 
 
 function setEmplyeeNamesLabel() {
-    let empLabel = '';
+    let empLabel = '<table class="table table-striped"><thead><th></th><th></th>';
+    for(let i = 0; i<payData.length ; i++)
+    {
+        empLabel += '<th>'+payData[i]["item"] + '</th>';
+    }
+    empLabel += '</thead>';
+
     for (let i = 0; i < ids.length; i++) {
 
         let emp = alasql('SELECT * from emp where id='+ids[i])[0];
         // console.log('id ',emp);
-        empLabel += '<img height=40 class="img-circle" src="img/' + emp.id + '.jpg">' + emp.name + '<br>';
+        empLabel += '<tr><td><img height=40 class="img-circle" src="img/' + emp.id + '.jpg"></td><td>' + emp.name + '</td>';
 
+        for(let j = 0 ; j<payData.length ; j++)
+        {
+            let payAmount = alasql('SELECT amount from payroll where emp= ? and item=?',[ids[i] , payData[j]["item"] ])[0]["amount"];
+            empLabel += '<td>'+payAmount+'</td>';
+
+        }
+
+        empLabel += '</tr>';
     }
     $('#employee_name_show_change_payroll').html(empLabel);
 
 }
 
+$('.class_col_another_item_percentage ').keyup(function () {
+    if( $(this).val() < 0)
+    {
+        alert("Reset percentage amount cannot be less than 0 . ");
+        $(this).val(0);
+    }
+
+});
+
+$('.class_col_1').keyup(function () {
+    if($(this).val() < 0 )
+    {
+        alert("Reset amount cannot be negative . ");
+        $(this).val(0);
+    }
+
+    if(typeof $(this).attr("max") !== 'undefined'){
+        let l = parseFloat($(this).attr("max"));
+        if($(this).val() >l)
+        {
+            alert("You cannot reset this payroll item over "+l);
+            $(this).val(l);
+        }
 
 
+    }
 
 
+});
+
+$('.class_col_4').keyup(function () {
+
+
+    if($(this).val() < 0 && parseFloat($(this).attr('min')) > $(this).val()){
+        console.log(typeof  $(this).attr('min') );
+
+        alert("You cannot decrease beyond "+Math.abs($(this).attr('min'))+'.');
+        $(this).val($(this).attr('min')  );
+    }
+
+    if(typeof $(this).attr("max") !== 'undefined'){
+        let l = parseFloat($(this).attr("max"));
+        if($(this).val() >l)
+        {
+            alert("You cannot increase this payroll item over "+l);
+            $(this).val(l);
+        }
+
+
+    }
+
+
+});
+
+$('.class_col_5').keyup(function () {
+    if($(this).val() < -100)
+    {
+        alert("You cannot decrease any item beyond 100 % .");
+        $(this).val(-100);
+    }
+});
 
 
 

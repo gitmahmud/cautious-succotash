@@ -170,6 +170,7 @@ function removeUncheckItemsFromEmp() {
 
 function addPayrollModalStart() {
     removeUncheckItemsFromEmp();
+
     let empLabel = '';
     for (let i = 0; i < emps.length; i++) {
         empLabel += '<img height=40 class="img-circle" src="img/' + emps[i].id + '.jpg">' + emps[i]["name"] + '<br>';
@@ -209,6 +210,12 @@ function bonusDistributionModalStart() {
 function checkAddPayrollValidation() {
     let pay_amount = parseInt($("#id_model_pay_amount").val());
     let pay_name = $("#id_payroll_item").val();
+    if(pay_name === '')
+    {
+        alert("Please provide a payroll name . ");
+        return false;
+    }
+
     let bigAmountContinue = true;
     if (pay_amount > 5000 && !pay_name.includes("salary")) {
         bigAmountContinue = confirm("This payroll looks unusaually big . Do you want to continue ?");
@@ -227,7 +234,7 @@ function checkAddPayrollValidation() {
             }
             else if (arr.length === 1) {
                 if (arr[0]["type"] === 'plus') {
-                    maximumDeductable = arr[0]["amount"];
+                    maximumDeductable = arr[0]["total"];
                 }
                 else {
                     maximumDeductable = 0;
@@ -240,6 +247,7 @@ function checkAddPayrollValidation() {
             }
 
         }
+        console.log("Max deductable "+maximumDeductable+' pay amount '+pay_amount);
         if (pay_amount > maximumDeductable) {
             alert("You can deduct maximum " + maximumDeductable + " dollar for selected employees . ");
             return false;
@@ -259,6 +267,7 @@ $("#add_payroll_submit").on('click',
         if (!checkAddPayrollValidation()) {
             return;
         }
+
         else {
             $('#addPayrollModal').modal('hide');
         }
@@ -526,7 +535,10 @@ $("#button_task_next").on('click', function () {
                 '</td><td>' +
                 '<div class="form-group">' +
                 '<textarea class="form-control class_select_description_role class_assign_employee_' + arr_task_emp[i]["emp_id"] + '"  rows="4"></textarea>' +
+
                 '</div></td>' +
+                '<td><input class="class_employee_start_date class_assign_employee_'+ arr_task_emp[i]["emp_id"] + '" type="date"></td>'+
+                '<td><input class="class_employee_end_date class_assign_employee_'+ arr_task_emp[i]["emp_id"] + '" type="date"></td>'+
                 '</tr>'
         }
     }
@@ -537,12 +549,23 @@ $("#button_task_next").on('click', function () {
 
 
 $('#modal_add_task_finish').on('click', function () {
+
+    if(!validateAssignDate()){
+        alert("Error . Start date is greater than end date!");
+        return ;
+    }
+
     let proj_name = $('#id_project_selection').find(":selected").text();
     for (let i = 0; i < arr_task_emp.length; i++) {
         if (arr_task_emp[i]["selectedEmp"]) {
 
             let currentRole = $('.class_select_checkbox_role.class_assign_employee_' + arr_task_emp[i]["emp_id"]).find(":selected").text();
             let currentDescription = $('.class_select_description_role.class_assign_employee_' + arr_task_emp[i]["emp_id"]).val();
+
+            let currentStartDate = $('.class_employee_start_date.class_assign_employee_'+ arr_task_emp[i]["emp_id"]).val()+'';
+            let currentEndDate = $('.class_employee_end_date.class_assign_employee_'+ arr_task_emp[i]["emp_id"]).val()+'';
+
+            console.log(currentEndDate + ' '+currentStartDate);
 
             // if(alasql('SELECT * from project where emp=?',[arr_task_emp[i]["emp_id"]]).length !== 0 ) {
             //
@@ -551,7 +574,7 @@ $('#modal_add_task_finish').on('click', function () {
             // else
             // {
             let row_id = alasql('SELECT MAX(id)+1 AS row_id from project')[0]['row_id'];
-            alasql('INSERT INTO project VALUES(?,?,?,?,?,?);', [row_id, arr_task_emp[i]["emp_id"], proj_name, currentRole, currentDescription, new Date().getTime()]);
+            alasql('INSERT INTO project VALUES(?,?,?,?,?,?,?,?);', [row_id, arr_task_emp[i]["emp_id"], proj_name, currentRole, currentDescription, new Date().getTime() ,currentStartDate, currentEndDate ]);
 
             //}
 
@@ -564,6 +587,29 @@ $('#modal_add_task_finish').on('click', function () {
 
 
 });
+
+function validateAssignDate() {
+    for(let i = 0 ; i<arr_task_emp.length ; i++)
+    {
+        if (arr_task_emp[i]["selectedEmp"]) {
+            let currentStartDate = $('.class_employee_start_date.class_assign_employee_'+ arr_task_emp[i]["emp_id"]).val();
+            let currentEndDate = $('.class_employee_end_date.class_assign_employee_'+ arr_task_emp[i]["emp_id"]).val();
+
+            if(currentStartDate > currentEndDate)
+            {
+
+                return false;
+            }
+
+
+        }
+
+
+    }
+
+    return true;
+
+}
 
 
 //console.log("q1 "+q1+" q2 "+q2+" q3 "+q3+" q4 "+q4+" q5 "+q5);
@@ -735,16 +781,18 @@ for (var i = 0; i < emps.length; i++) {
     var emp = emps[i];
     let temp = alasql("SELECT * from skill where emp=" + emp.id);
 
-    let skills = "";
+    let skills = "<ul>";
     for (let ii = 0; ii < temp.length; ii++) {
-        skills += temp[ii]["name"] + "<br>";
+        skills += "<li>" + temp[ii]["name"] + "</li>";
     }
+    skills += '</ul>';
 
     temp = alasql("SELECT * from project where emp=" + emp.id);
-    let projects = "";
+    let projects = "<ol>";
     for (let ii = 0; ii < temp.length; ii++) {
-        projects += temp[ii]["name"] + "<br>";
+        projects += "<li>" + temp[ii]["name"] + "</li>";
     }
+    projects += "</ol>";
 
     temp = alasql("SELECT * from professional where emp=" + emp.id)[0];
     let joining = getDateFromMS(temp.joining);
@@ -759,10 +807,12 @@ for (var i = 0; i < emps.length; i++) {
 
     temp = alasql("SELECT *  from payroll where emp =" + emp.id);
 
-    let payroll_names = "";
+    let payroll_names = "<ul>";
     for (let ii = 0; ii < temp.length; ii++) {
-        payroll_names += temp[ii]["item"] + " : " + temp[ii]["amount"] + "<br>"
+        payroll_names += "<li>" +temp[ii]["item"] + " : <b>" + temp[ii]["amount"] + "</b></li>"
     }
+    payroll_names += '</ul';
+
 
 
     var tr = $('<tr></tr>');
@@ -782,6 +832,8 @@ for (var i = 0; i < emps.length; i++) {
     tr.append('<td class="background_birthday_index_page">' + emp.birthday + '</td>');
     tr.appendTo(tbody);
 }
+$('#search_result_label').append('<b>Total result found : '+emps.length+'</b>');
+
 
 markSearchFields();
 
@@ -1104,13 +1156,17 @@ function empSkillExpSortShow(arr_task_emp) {
         let row_name_emp = "class_task_row_" + arr_task_emp[i]["emp_id"];
         let empBusyClass = arr_task_emp[i]["is_busy"] ? ' busy_emp_class ' : 'free_emp_class';
         let checkboxText = arr_task_emp[i]["selectedEmp"] ? 'checked' : '';
+        let expereicneTooltipLabel = Math.floor(arr_task_emp[i]["joining_time"]/31536000000) === 0 ? 'Experience : Less than a year . ': 'Experience : '+Math.floor(arr_task_emp[i]["joining_time"]/31536000000)+' years.';
+
+        console.log( arr_task_emp[i]["joining_time"]);
 
         repStr +=
             '<tr class="' + empBusyClass + '">' +
             '<td class="col-sm-1"><input type="checkbox" class=" class_task_checkbox ' + row_name_emp + ' " ' + checkboxText + ' ></td>' +
             '<td class="col-lg-3">' + arr_task_emp[i]["name"] + '</td>' +
-            '<td class="col-sm-2 ' + arr_task_emp[i]["skill_bg_color"] + ' " >' + arr_task_emp[i]["skill_level"] + '</td>' +
-            '<td class="col-sm-2 ' + arr_task_emp[i]["join_bg_color"] + ' " >' + arr_task_emp[i]["experience"] + '</td>' +
+            '<td class="col-sm-2 ' + arr_task_emp[i]["skill_bg_color"] + ' " >' + arr_task_emp[i]["skill_level"] + ' (<b>'+arr_task_emp[i]["skill_avg"].toFixed(2)+'</b>)</td>' +
+            '<td class="col-sm-2 ' + arr_task_emp[i]["join_bg_color"] + ' " data-toggle="tooltip" data-placement="top" title="'+expereicneTooltipLabel+'">'+arr_task_emp[i]["experience"]+'</td>' +
+
             '</tr>';
     }
 

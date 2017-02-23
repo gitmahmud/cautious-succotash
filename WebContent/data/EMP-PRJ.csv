@@ -1,6 +1,9 @@
-ID,EMP,NAME,ROLE,DESCRIPTION,CREATED
-1,1,product x,Manager,demo desc,1487046739372
-2,3,product x,Manager,demo desc,1487046739372
-3,19,product x,Member,demo ,1487046739372
-4,20,product x,Member,demo ,1487046739372
-5,5,product x,Manager,demo ,1487046739372
+ID,EMP,NAME,ROLE,DESCRIPTION,CREATED,STARTDATE,ENDDATE
+1,1,Product x,Manager,demo desc,1487046739372,,
+2,3,Product x,Manager,demo desc,1487046739372,,
+3,19,Product x,Member,demo ,1487046739372,,
+4,20,Product x,Member,demo ,1487046739372,,
+5,5,Product x,Manager,demo ,1487046739372,,
+6,20,Research product alpha,Member,demo ,1487046739372,,
+7,19,Research product alpha,Member,demo ,1487046739372,,
+

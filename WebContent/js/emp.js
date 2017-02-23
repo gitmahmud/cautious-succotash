@@ -48,6 +48,8 @@ if (emp_projects.length !== 0) {
 				'<td>'+emp_project.role+'</td>'+
 				'<td>'+emp_project.description+'</td>'+
 				'<td>'+getDateFromMS(emp_project.created)+'</td>'+
+				'<td>'+emp_project.startdate+'</td>'+
+				'<td>'+emp_project.enddate+'</td>'+
 				'</tr>';
 
         // $('#project_name').text(emp_project.name);

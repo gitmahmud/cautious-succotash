@@ -58,17 +58,17 @@
 
 <div class="container">
     <!--<form action="index.html" class="form-inline text-center">-->
-        <!--<div class="form-group">-->
-            <!--<input name="q1" type="text" class="form-control"-->
-                   <!--placeholder="employee number">-->
-        <!--</div>-->
-        <!--<div class="form-group">-->
-            <!--<input name="q2" type="text" class="form-control"-->
-                   <!--placeholder="part of name">-->
-        <!--</div>-->
-        <!--<button type="submit" class="btn btn-primary">-->
-            <!--<span class="glyphicon glyphicon-search"></span> Search-->
-        <!--</button>-->
+    <!--<div class="form-group">-->
+    <!--<input name="q1" type="text" class="form-control"-->
+    <!--placeholder="employee number">-->
+    <!--</div>-->
+    <!--<div class="form-group">-->
+    <!--<input name="q2" type="text" class="form-control"-->
+    <!--placeholder="part of name">-->
+    <!--</div>-->
+    <!--<button type="submit" class="btn btn-primary">-->
+    <!--<span class="glyphicon glyphicon-search"></span> Search-->
+    <!--</button>-->
     <!--</form>-->
     <hr>
     <p class="bg-warning">You can search for age ,experience , skill ,designation , department , martial status ,
@@ -128,7 +128,7 @@
     <div class="clearfix" style="margin: 10px 0;" id="new_emp">
 
         <!--<a href="emp-form.html" class="btn btn-sm btn-success pull-right"><span-->
-                <!--class="glyphicon glyphicon-plus"></span> New</a>-->
+        <!--class="glyphicon glyphicon-plus"></span> New</a>-->
 
     </div>
 
@@ -289,7 +289,8 @@
                             <div class="form-group">
 
                                 <label for="id_bonus_total_amount_input">Total bonus amount </label>
-                                <input type="number" class="form-control" placeholder="Bonus" id="id_bonus_total_amount_input">
+                                <input type="number" class="form-control" placeholder="Bonus"
+                                       id="id_bonus_total_amount_input">
                             </div>
 
                             <div class="form-group form-inline">
@@ -321,7 +322,9 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default btn-primary" id="bonus_distribution_submission" >Proceed</button>
+                        <button type="button" class="btn btn-default btn-primary" id="bonus_distribution_submission">
+                            Proceed
+                        </button>
                     </div>
                 </div>
 
@@ -354,8 +357,8 @@
                             <thead>
                             <tr>
                                 <th class="col-sm-1"></th>
-                                <th class="col-sm-3">Employee Name</th>
-                                <th class="col-sm-2">Skill Level
+                                <th class="col-sm-2">Employee Name</th>
+                                <th class="col-sm-3">Skill Level (Rating)
                                     <div>
                                         <button class="btn btn-xs btn-info" id="id_skill_sort_btn_asc"><span
                                                 class="glyphicon glyphicon-chevron-down"></span></button>
@@ -397,27 +400,30 @@
 
         </div>
 
-        <div id="modalAssignEmployee" class="modal fade" role="dialog">
+        <div id="modalAssignEmployee" class="modal  fade" role="dialog">
             <div class="modal-dialog">
 
                 <!-- Modal content-->
-                <div class="modal-content">
+                <div class="modal-content" style="width: 850px;">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">Assign role to employees</h4>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="max-height: 600px ; overflow-y: auto">
                         <div class="form-group form-inline">
                             <label for="id_project_selection">Project name</label>
                             <select class="form-control" id="id_project_selection">
 
                             </select>
                         </div>
-                        <table class="table table-striped">
+                        <table class="table table-striped"   >
                             <thead>
                             <th class="col-sm-2">Employee Name</th>
                             <th class="col-sm-2">Role</th>
                             <th class="col-sm-4">Description</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+
                             </thead>
                             <tbody id="tbody_assign_role">
 
@@ -467,23 +473,32 @@
     $('#more_search_button').on('click', function () {
 
 
-        let nextId = 'q' + (parseInt($("#free_search_group").children(':last-child').children(':last-child').attr("name").substring(1)) + 1);
+        let nextId;
+        if (typeof $("#free_search_group").children(':last-child').children(':last-child').attr("name") !== 'undefined') {
+            nextId = 'q' + (parseInt($("#free_search_group").children(':last-child').children(':last-child').attr("name").substring(1)) + 1);
+        }
+        else {
+            nextId = 'q' + (parseInt($("#free_search_group").children(':last-child').children(':last-child').attr("id").substring(1)) + 1);
+
+        }
 
 
         $('#free_search_group').append('<div><select class="form-control" id="sbox_' + nextId.substring(1) + '">' +
-            ' <option>Designation</option>' +
-            '      <option>Skill</option>        <option>Department</option>        <option>Age</option>    ' +
+            ' <option>Skill</option>' +
+            '      <option>Designation</option>        <option>Department</option>        <option>Age</option>    ' +
             '    <option>Experience</option>        <option>Major</option>        <option>School</option>     ' +
             '   <option>Lives in</option>        <option>Joining Date</option>    <option>Nationality</option>   ' +
             ' <option>Marital Status</option></select>' +
             '<input name="' + nextId + '" type="text" class="form-control" placeholder=""></div>');
 
 
+        $('*[id*="sbox"]').unbind('change');
+        $('*[id*="sbox"]').change(changeFreeSearchBox);
+
+
     });
 
-    //$('*[id*="sbox"]').
-
-
+    $('*[id*="sbox"]').change(changeFreeSearchBox);
 
 
     $('#id_modal_select_option').change(function () {
@@ -564,6 +579,72 @@
         }
 
     });
+
+    $('#id_model_pay_amount').keyup(function () {
+        if($(this).val() < 0 )
+        {
+            alert("You cannot input negative amount . Select 'deduct' option to deduct an amount from employees salary. ");
+            $(this).val(0);
+
+        }
+    });
+
+
+    function changeFreeSearchBox() {
+        let searchBoxId = parseInt($(this).attr("id").substring(5));
+
+
+        console.log(searchBoxId);
+
+        if ($(this).val() === "Designation") {
+            let arr = alasql('SELECT desgn from emp group by desgn');
+
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 'desgn', searchBoxId));
+
+        }
+        else if ($(this).val() === "Department") {
+            let arr = alasql('SELECT dept from emp group by dept');
+
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 'dept', searchBoxId));
+        }
+        else if ($(this).val() === "Major") {
+            let arr = alasql('SELECT major from edu group by major');
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 'major', searchBoxId));
+
+        }
+        else if ($(this).val() === "Nationality") {
+            let arr = alasql("SELECT nationality FROM professional GROUP BY nationality");
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 'nationality', searchBoxId));
+
+        }
+        else if ($(this).val() === 'Martial') {
+            let arr = [{'s': 'unmarried'}, {'s': 'married and has no children'}, {'s': 'married and has children'}];
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 's', searchBoxId));
+        }
+        else if ($(this).val() === 'Project') {
+            let arr = alasql("SELECT name FROM role_project where type='project' GROUP BY name");
+            $("input[name='q" + searchBoxId + "']").replaceWith(createSelectOptionArray(arr, 'name', searchBoxId));
+
+
+        }
+        else {
+            $('#q' + searchBoxId).replaceWith('<input name="' + searchBoxId + '" type="text" class="form-control" placeholder="">');
+
+        }
+
+
+    }
+
+    function createSelectOptionArray(arr, propertyVal, searchBoxId) {
+        let str = '<select class="form-control" id="q' + searchBoxId + '">';
+        for (let i = 0; i < arr.length; i++) {
+            str += '<option>' + arr[i][propertyVal] + '</option>';
+
+        }
+        str += '</select>';
+
+        return str;
+    }
 
 
 </script>
